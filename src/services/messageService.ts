@@ -15,15 +15,19 @@ interface HandleMessageResponse {
  */
 function handleMessage(message: string): HandleMessageResponse {
   const selectedRanges = extractRangesFromMessage(message);
-  
+
   const payload: MessageRequest = {
     message,
     selected_ranges: selectedRanges,
     llm_provider: 'google',
-    llm_model: 'gemini-2.5-flash-lite'
+    llm_model: 'gemini-2.5-flash-lite',
   };
 
-  const response = callApi<MessageResponse>('POST', `${CONFIG.API_URL}${API_PATHS.CHAT_SEND_MESSAGE}`, payload);
+  const response = callApi<MessageResponse>(
+    'POST',
+    `${CONFIG.API_URL}${API_PATHS.CHAT_SEND_MESSAGE}`,
+    payload,
+  );
 
   if ('error' in response) {
     return { reply: `Something went wrong: ${response.error}` };
@@ -33,16 +37,12 @@ function handleMessage(message: string): HandleMessageResponse {
     const filled_ranges = response.filled_ranges;
     if (filled_ranges && filled_ranges.length > 0) {
       filled_ranges.forEach(filled_range => {
-        fillCellsWithFormula(
-          filled_range.sheet_name,
-          filled_range.range,
-          filled_range.r1c1_value
-        );
+        fillCellsWithFormula(filled_range.sheet_name, filled_range.range, filled_range.r1c1_value);
       });
     }
   } catch (err) {
     const error = err as Error;
-    return { reply: "Error while filling cells: " + error.message };
+    return { reply: 'Error while filling cells: ' + error.message };
   }
 
   return { reply: response.message || 'No reply from server.' };

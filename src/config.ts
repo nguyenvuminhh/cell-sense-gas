@@ -50,4 +50,3 @@ export interface RangePayload {
   sheet_name_and_range: string;
   cell_values: unknown[][];
 }
-

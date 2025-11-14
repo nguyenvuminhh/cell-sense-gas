@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <base target="_top">
+    <base target="_top" />
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -120,7 +120,6 @@
       #send-btn {
         background: #1d4ed8;
       }
-
     </style>
   </head>
   <body>
@@ -129,9 +128,15 @@
 
       <div id="input-area">
         <div id="chat-input-group">
-          <textarea id="user-input" placeholder="Ask something..." aria-label="Message input"></textarea>
+          <textarea
+            id="user-input"
+            placeholder="Ask something..."
+            aria-label="Message input"
+          ></textarea>
           <div class="btn-row">
-            <button id="select-btn" class="btn" onclick="fillSelectedRange()">Select Context</button>
+            <button id="select-btn" class="btn" onclick="fillSelectedRange()">
+              Select Context
+            </button>
             <button id="add-target-btn" class="btn" onclick="addTargetCell()">Add Target</button>
           </div>
           <div class="btn-row">

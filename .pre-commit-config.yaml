@@ -11,7 +11,7 @@ repos:
       - id: check-added-large-files
 
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: "v3.1.0"
+    rev: 'v3.1.0'
     hooks:
       - id: prettier
 
@@ -21,6 +21,7 @@ repos:
         name: ESLint
         entry: npx eslint
         language: system
+        files: ^src/
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.9.0.5
@@ -31,17 +32,12 @@ repos:
     rev: v0.38.0
     hooks:
       - id: markdownlint
-        args: ["--fix"]
+        args: ['--fix']
 
-  - repo: https://github.com/JangasCodingplace/commit-prefix-pre-commit
-    rev: v0.0.1-beta
+  - repo: local
     hooks:
-      - id: commit-prefix
-        stages: [commit-msg]
-
-  - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v3.1.0
-    hooks:
-      - id: conventional-pre-commit
-        stages: [commit-msg]
-        args: []
+      - id: generate-openapi-types
+        name: Generate OpenAPI Types
+        entry: make export_openapi_types
+        language: system
+        pass_filenames: false

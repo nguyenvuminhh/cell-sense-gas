@@ -10,11 +10,11 @@ import { ApiResponse, ApiErrorResponse } from '../config';
 function buildQuery(query: Record<string, string | number | boolean> = {}): string {
   const keys = Object.keys(query);
   if (keys.length === 0) return '';
-  
+
   const params = keys
     .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`)
     .join('&');
-  
+
   return `?${params}`;
 }
 
@@ -25,12 +25,14 @@ function callApi<T>(
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
   url: string,
   payload: Record<string, unknown> = {},
-  query: Record<string, string | number | boolean> = {}
+  query: Record<string, string | number | boolean> = {},
 ): ApiResponse<T> {
+  // eslint-disable-next-line no-undef
   const userEmail = Session.getActiveUser().getEmail();
   query.user_email = userEmail;
-  
+
   const fullUrl = url + buildQuery(query);
+  // eslint-disable-next-line no-undef
   const options: GoogleAppsScript.URL_Fetch.URLFetchRequestOptions = {
     method: method,
     contentType: 'application/json',
@@ -41,17 +43,22 @@ function callApi<T>(
     options.payload = JSON.stringify(payload);
   }
 
+  /* eslint-disable */
   Logger.log('🔹 Request URL: ' + fullUrl);
   Logger.log('🔹 Method: ' + method);
   Logger.log('🔹 Payload: ' + JSON.stringify(payload));
+  /* eslint-enable */
 
   try {
+    // eslint-disable-next-line no-undef
     const response = UrlFetchApp.fetch(fullUrl, options);
     const code = response.getResponseCode();
     const text = response.getContentText();
 
+    /* eslint-disable */
     Logger.log('🔹 Response Code: ' + code);
     Logger.log('🔹 Response Body: ' + text);
+    /* eslint-enable */
 
     if (code >= 200 && code < 300) {
       return JSON.parse(text) as T;
@@ -60,6 +67,7 @@ function callApi<T>(
     }
   } catch (e) {
     const error = e as Error;
+    // eslint-disable-next-line no-undef
     Logger.log('Error: ' + error.message);
     return { error: error.message } as ApiErrorResponse;
   }

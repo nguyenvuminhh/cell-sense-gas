@@ -10,7 +10,7 @@ export {
   getActiveRangeA1Notation,
   getRangePayload,
   extractRangesFromMessage,
-  fillCellsWithFormula
+  fillCellsWithFormula,
 } from './sheetUtils';
 
 // Chat Service
@@ -22,7 +22,7 @@ export {
   deleteChat,
   getChatMessages,
   createChatMessage,
-  deleteChatMessage
+  deleteChatMessage,
 } from './chatService';
 
 // Message Service

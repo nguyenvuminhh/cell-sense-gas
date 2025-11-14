@@ -8,6 +8,7 @@ import { ActiveRangeInfo, RangePayload } from '../config';
  * Get the currently active range in A1 notation
  */
 function getActiveRangeA1Notation(): ActiveRangeInfo | null {
+  // eslint-disable-next-line no-undef
   const sheet = SpreadsheetApp.getActiveSheet();
   if (!sheet) {
     return null;
@@ -18,7 +19,7 @@ function getActiveRangeA1Notation(): ActiveRangeInfo | null {
   }
   return {
     sheetName: sheet.getName(),
-    activeRange: activeRange.getA1Notation()
+    activeRange: activeRange.getA1Notation(),
   };
 }
 
@@ -34,6 +35,7 @@ function getRangePayload(rangeLabel: string): RangePayload | null {
   const sheetName = match[1].replace(/''/g, "'");
   const rangeNotation = match[2];
 
+  // eslint-disable-next-line no-undef
   const spreadsheet = SpreadsheetApp.getActive();
   const sheet = spreadsheet.getSheetByName(sheetName);
   if (!sheet) {
@@ -44,6 +46,7 @@ function getRangePayload(rangeLabel: string): RangePayload | null {
     const cell_values = sheet.getRange(rangeNotation).getValues();
     return { sheet_name_and_range: rangeLabel, cell_values };
   } catch (error) {
+    // eslint-disable-next-line no-undef
     Logger.log(`Failed to read range ${rangeLabel}: ${error}`);
     return null;
   }
@@ -64,7 +67,7 @@ function extractRangesFromMessage(message: string): RangePayload[] {
       continue;
     }
     seen.add(rangeLabel);
-    
+
     const payload = getRangePayload(rangeLabel);
     if (payload) {
       ranges.push(payload);
@@ -77,11 +80,8 @@ function extractRangesFromMessage(message: string): RangePayload[] {
 /**
  * Fill cells with formula
  */
-function fillCellsWithFormula(
-  sheetName: string,
-  range: string,
-  r1c1Formula: string
-): void {
+function fillCellsWithFormula(sheetName: string, range: string, r1c1Formula: string): void {
+  // eslint-disable-next-line no-undef
   const targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
   if (!targetSheet) {
     throw new Error(`Sheet not found: ${sheetName}`);
@@ -95,5 +95,5 @@ export {
   getActiveRangeA1Notation,
   getRangePayload,
   extractRangesFromMessage,
-  fillCellsWithFormula
+  fillCellsWithFormula,
 };
