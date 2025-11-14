@@ -1,8 +1,14 @@
 {
   "compilerOptions": {
-    "target": "ES2019",
+    "outDir": "dist", // <— compiled output goes here
+    "rootDir": "src", // <— where your source files live
+    "target": "ESNext",
     "module": "none",
-    "outDir": "dist",
-    "strict": true
-  }
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src"]
 }

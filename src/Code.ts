@@ -28,3 +28,5 @@ function showChatList() {
     .setWidth(450);
   SpreadsheetApp.getUi().showSidebar(html);
 }
+
+export { onOpen, showChatInterface, showChatList };

@@ -1,10 +1,10 @@
 import { components, paths } from './types';
 
-export const CONFIG = {
+const CONFIG = {
   API_URL: 'https://turgid-unverified-sherril.ngrok-free.dev',
 } as const;
 
-export const API_PATHS = {
+const API_PATHS = {
   PING: '/ping' as keyof paths,
   ROOT: '/' as keyof paths,
   CHAT_SEND_MESSAGE: '/chat/send-message' as keyof paths,
@@ -21,32 +21,53 @@ export const API_PATHS = {
 } as const;
 
 // Re-export all types from OpenAPI schema
-export type MessageRequest = components['schemas']['MessageRequest'];
-export type MessageResponse = components['schemas']['MessageResponse'];
-export type ChatRequest = components['schemas']['ChatRequest'];
-export type Chat = components['schemas']['Chat'];
-export type ChatMessage = components['schemas']['ChatMessage'];
-export type ChatMessageRequest = components['schemas']['ChatMessageRequest'];
-export type SelectedRange = components['schemas']['SelectedRange'];
-export type FilledRange = components['schemas']['FilledRange'];
-export type LLMModels = components['schemas']['LLMModels'];
-export type LLMProviders = components['schemas']['LLMProviders'];
-export type ValidationError = components['schemas']['ValidationError'];
-export type HTTPValidationError = components['schemas']['HTTPValidationError'];
+type MessageRequest = components['schemas']['MessageRequest'];
+type MessageResponse = components['schemas']['MessageResponse'];
+type ChatRequest = components['schemas']['ChatRequest'];
+type Chat = components['schemas']['Chat'];
+type ChatMessage = components['schemas']['ChatMessage'];
+type ChatMessageRequest = components['schemas']['ChatMessageRequest'];
+type SelectedRange = components['schemas']['SelectedRange'];
+type FilledRange = components['schemas']['FilledRange'];
+type LLMModels = components['schemas']['LLMModels'];
+type LLMProviders = components['schemas']['LLMProviders'];
+type ValidationError = components['schemas']['ValidationError'];
+type HTTPValidationError = components['schemas']['HTTPValidationError'];
 
 // Custom app-specific types (not in backend schema)
-export interface ApiErrorResponse {
+interface ApiErrorResponse {
   error: string;
 }
 
-export type ApiResponse<T> = T | ApiErrorResponse;
+type ApiResponse<T> = T | ApiErrorResponse;
 
-export interface ActiveRangeInfo {
+interface ActiveRangeInfo {
   sheetName: string;
   activeRange: string;
 }
 
-export interface RangePayload {
+interface RangePayload {
   sheet_name_and_range: string;
   cell_values: unknown[][];
 }
+
+export {
+  CONFIG,
+  API_PATHS,
+  MessageRequest,
+  MessageResponse,
+  ChatRequest,
+  Chat,
+  ChatMessage,
+  ChatMessageRequest,
+  SelectedRange,
+  FilledRange,
+  LLMModels,
+  LLMProviders,
+  ValidationError,
+  HTTPValidationError,
+  ApiErrorResponse,
+  ApiResponse,
+  ActiveRangeInfo,
+  RangePayload,
+};

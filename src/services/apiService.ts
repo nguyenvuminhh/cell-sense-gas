@@ -22,7 +22,7 @@ function buildQuery(query: Record<string, string | number | boolean> = {}): stri
  * Make API call to backend
  */
 function callApi<T>(
-  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
   url: string,
   payload: Record<string, unknown> = {},
   query: Record<string, string | number | boolean> = {},
@@ -34,7 +34,8 @@ function callApi<T>(
   const fullUrl = url + buildQuery(query);
   // eslint-disable-next-line no-undef
   const options: GoogleAppsScript.URL_Fetch.URLFetchRequestOptions = {
-    method: method,
+    // eslint-disable-next-line no-undef
+    method: method.toLowerCase() as GoogleAppsScript.URL_Fetch.HttpMethod,
     contentType: 'application/json',
     muteHttpExceptions: true,
   };
