@@ -1,0 +1,191 @@
+<!doctype html>
+<html>
+  <head>
+    <script>
+      // Server-side data injected by Apps Script
+      const CHATS = <?!= chats || '[]' ?>;
+    </script>
+    <base target="_top" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #0f172a;
+        color: white;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        font-size: 13px;
+      }
+
+      #container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        box-sizing: border-box;
+        overflow-y: auto;
+      }
+
+      h2 {
+        margin: 0 0 16px 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+
+      .chat-item {
+        background: #1f2937;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: background 0.2s;
+        border: 1px solid transparent;
+      }
+
+      .chat-item:hover {
+        background: #374151;
+        border-color: #4b5563;
+      }
+
+      .chat-title {
+        font-size: 0.95rem;
+        font-weight: 500;
+        margin-bottom: 4px;
+      }
+
+      .chat-date {
+        font-size: 0.75rem;
+        color: #9ca3af;
+      }
+
+      .no-chats {
+        text-align: center;
+        color: #9ca3af;
+        padding: 40px 20px;
+        font-size: 0.9rem;
+      }
+
+      .loading {
+        text-align: center;
+        color: #9ca3af;
+        padding: 20px;
+      }
+
+      .new-chat-button {
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        width: 100%;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        margin-bottom: 16px;
+        transition:
+          background 0.2s,
+          transform 0.1s;
+      }
+
+      .new-chat-button:hover {
+        background: #1d4ed8;
+      }
+
+      .new-chat-button:active {
+        transform: scale(0.98);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <h2>Chat History</h2>
+      <div id="new-chat-wrapper"></div>
+      <div id="chat-list"></div>
+    </div>
+  </body>
+  <script>
+    /**
+     * Format date to readable string
+     */
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) {
+        return 'Today';
+      } else if (diffDays === 1) {
+        return 'Yesterday';
+      } else if (diffDays < 7) {
+        return `${diffDays} days ago`;
+      } else {
+        return date.toLocaleDateString();
+      }
+    }
+
+    /**
+     * Open a specific chat
+     */
+    function openChat(chatId) {
+      google.script.run
+        .withSuccessHandler(function () {
+          // Chat opened successfully
+        })
+        .withFailureHandler(function (error) {
+          alert('Error opening chat: ' + (error.message || error));
+        })
+        .openChatById(chatId);
+    }
+
+    /**
+     * Load and display chat list
+     */
+    const chatListContainer = document.getElementById('chat-list');
+
+    if (typeof CHATS !== 'undefined' && Array.isArray(CHATS) && CHATS.length > 0) {
+      CHATS.forEach(function (chat) {
+        const chatItem = document.createElement('div');
+        chatItem.className = 'chat-item';
+        chatItem.onclick = function () {
+          openChat(chat.id);
+        };
+
+        const title = document.createElement('div');
+        title.className = 'chat-title';
+        title.textContent = chat.title || 'Untitled Chat';
+
+        const date = document.createElement('div');
+        date.className = 'chat-date';
+        date.textContent = formatDate(chat.updated_at);
+
+        chatItem.appendChild(title);
+        chatItem.appendChild(date);
+        chatListContainer.appendChild(chatItem);
+      });
+    } else {
+      const noChats = document.createElement('div');
+      noChats.className = 'no-chats';
+      noChats.textContent = 'No chats yet. Create a new chat to get started!';
+      chatListContainer.appendChild(noChats);
+    }
+    // Create a new chat button
+    const newChatButton = document.createElement('button');
+    newChatButton.className = 'new-chat-button';
+    newChatButton.textContent = 'Create New Chat';
+
+    newChatButton.onclick = function () {
+      google.script.run
+        .withSuccessHandler(function () {
+          // Success message optional
+        })
+        .withFailureHandler(function (error) {
+          alert('Error creating new chat: ' + (error.message || error));
+        })
+        .createNewChat();
+    };
+
+    document.getElementById('new-chat-wrapper').appendChild(newChatButton);
+  </script>
+</html>

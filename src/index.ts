@@ -3,7 +3,6 @@ export {
   API_PATHS,
   MessageRequest,
   MessageResponse,
-  ChatRequest,
   Chat,
   ChatMessage,
   ChatMessageRequest,
@@ -29,14 +28,16 @@ export {
   extractRangesFromMessage,
   fillCellsWithFormula,
   getChatList,
+  getLatestChat,
   createChat,
   getChat,
-  updateChat,
   deleteChat,
   getChatMessages,
   createChatMessage,
   deleteChatMessage,
   handleMessage,
+  getSecret,
+  signPayload,
 } from './services';
 
-export { onOpen, showChatInterface, showChatList } from './Code';
+export { onOpen, showLatestChat, showChatList, createNewChat, openChatById } from './Code';

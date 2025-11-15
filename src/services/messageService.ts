@@ -12,8 +12,10 @@ interface HandleMessageResponse {
 
 /**
  * Handle user message and interact with backend API
+ * @param message - User message text
+ * @param chatId - The chat ID to send the message to
  */
-function handleMessage(message: string): HandleMessageResponse {
+function handleMessage(message: string, chatId: number): HandleMessageResponse {
   const selectedRanges = extractRangesFromMessage(message);
 
   const payload: MessageRequest = {
@@ -23,11 +25,8 @@ function handleMessage(message: string): HandleMessageResponse {
     llm_model: 'gemini-2.5-flash-lite',
   };
 
-  const response = callApi<MessageResponse>(
-    'POST',
-    `${CONFIG.API_URL}${API_PATHS.CHAT_SEND_MESSAGE}`,
-    payload,
-  );
+  const path = API_PATHS.CHAT_SEND_MESSAGE.replace('{chat_id}', chatId.toString());
+  const response = callApi<MessageResponse>('POST', `${CONFIG.API_URL}${path}`, payload);
 
   if ('error' in response) {
     return { reply: `Something went wrong: ${response.error}` };

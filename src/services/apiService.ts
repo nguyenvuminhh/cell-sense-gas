@@ -3,6 +3,7 @@
  */
 
 import { ApiResponse, ApiErrorResponse } from '../config';
+import { signPayload } from './cryptoService';
 
 /**
  * Build query string from object
@@ -26,18 +27,25 @@ function callApi<T>(
   url: string,
   payload: Record<string, unknown> = {},
   query: Record<string, string | number | boolean> = {},
+  headers: Record<string, string> = {},
+  isFetchingSignature = false,
 ): ApiResponse<T> {
   // eslint-disable-next-line no-undef
   const userEmail = Session.getActiveUser().getEmail();
   query.user_email = userEmail;
 
-  const fullUrl = url + buildQuery(query);
+  const fullUrl = url + (isFetchingSignature ? '' : buildQuery(query));
   // eslint-disable-next-line no-undef
   const options: GoogleAppsScript.URL_Fetch.URLFetchRequestOptions = {
     // eslint-disable-next-line no-undef
     method: method.toLowerCase() as GoogleAppsScript.URL_Fetch.HttpMethod,
     contentType: 'application/json',
     muteHttpExceptions: true,
+    headers: {
+      'ngrok-skip-browser-warning': 'true',
+      ...(isFetchingSignature ? {} : { 'X-Signature': signPayload(payload, fullUrl) }),
+      ...headers,
+    },
   };
 
   if (['POST', 'PUT', 'PATCH'].includes(method)) {

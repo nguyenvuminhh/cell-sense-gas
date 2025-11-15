@@ -6,10 +6,10 @@ import {
   CONFIG,
   API_PATHS,
   Chat,
-  ChatRequest,
   ChatMessage,
   ChatMessageRequest,
   ApiResponse,
+  LLMModels,
 } from '../config';
 import { callApi } from './apiService';
 
@@ -22,14 +22,18 @@ function getChatList(): ApiResponse<Chat[]> {
 }
 
 /**
+ * Get the latest chat (most recently updated) for the current user
+ */
+function getLatestChat(): ApiResponse<Chat> {
+  const response = callApi<Chat>('GET', `${CONFIG.API_URL}${API_PATHS.CHAT_LATEST}`);
+  return response;
+}
+
+/**
  * Create a new chat
  */
-function createChat(title: string = 'New Chat'): ApiResponse<Chat> {
-  const payload: ChatRequest = {
-    title,
-    user_id: 0, // This will be set by the backend based on user_email
-  };
-  const response = callApi<Chat>('POST', `${CONFIG.API_URL}${API_PATHS.CHAT_NEW}`, payload);
+function createChat(): ApiResponse<Chat> {
+  const response = callApi<Chat>('POST', `${CONFIG.API_URL}${API_PATHS.CHAT_NEW}`);
   return response;
 }
 
@@ -39,19 +43,6 @@ function createChat(title: string = 'New Chat'): ApiResponse<Chat> {
 function getChat(chatId: number): ApiResponse<Chat> {
   const path = API_PATHS.CHAT_BY_ID.replace('{chat_id}', chatId.toString());
   const response = callApi<Chat>('GET', `${CONFIG.API_URL}${path}`);
-  return response;
-}
-
-/**
- * Update chat title
- */
-function updateChat(chatId: number, title: string): ApiResponse<Chat> {
-  const payload: ChatRequest = {
-    title,
-    user_id: 0, // This will be set by the backend based on user_email
-  };
-  const path = API_PATHS.CHAT_BY_ID.replace('{chat_id}', chatId.toString());
-  const response = callApi<Chat>('PUT', `${CONFIG.API_URL}${path}`, payload);
   return response;
 }
 
@@ -80,7 +71,7 @@ function createChatMessage(
   chatId: number,
   content: string,
   isFromUser: boolean,
-  modelName?: string,
+  modelName?: LLMModels,
 ): ApiResponse<ChatMessage> {
   const payload: ChatMessageRequest = {
     chat_id: chatId,
@@ -104,9 +95,9 @@ function deleteChatMessage(messageId: number): ApiResponse<{ message: string }> 
 
 export {
   getChatList,
+  getLatestChat,
   createChat,
   getChat,
-  updateChat,
   deleteChat,
   getChatMessages,
   createChatMessage,

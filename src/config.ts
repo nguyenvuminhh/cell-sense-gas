@@ -2,14 +2,20 @@ import { components, paths } from './types';
 
 const CONFIG = {
   API_URL: 'https://turgid-unverified-sherril.ngrok-free.dev',
+  GCP_SECRET_MANAGER_URL:
+    'https://secretmanager.googleapis.com/v1/projects/${projectId}' +
+    '/secrets/${secretName}/versions/latest:access',
+  PROJECT_NUMBER: '903488684125',
+  SECRET_SIGNATURE_PRIVATE_KEY: 'SIGNATURE_PRIVATE_KEY',
 } as const;
 
 const API_PATHS = {
   PING: '/ping' as keyof paths,
   ROOT: '/' as keyof paths,
-  CHAT_SEND_MESSAGE: '/chat/send-message' as keyof paths,
+  CHAT_SEND_MESSAGE: '/chat/{chat_id}/send-message' as keyof paths,
   CHAT_LIST: '/chat/list' as keyof paths,
   CHAT_NEW: '/chat/new' as keyof paths,
+  CHAT_LATEST: '/chat/latest' as keyof paths,
   CHAT_BY_ID: '/chat/{chat_id}' as keyof paths,
   CHAT_MESSAGES: '/chat/{chat_id}/messages' as keyof paths,
   DELETE_MESSAGE: '/chat/messages/{message_id}' as keyof paths,
@@ -23,7 +29,6 @@ const API_PATHS = {
 // Re-export all types from OpenAPI schema
 type MessageRequest = components['schemas']['MessageRequest'];
 type MessageResponse = components['schemas']['MessageResponse'];
-type ChatRequest = components['schemas']['ChatRequest'];
 type Chat = components['schemas']['Chat'];
 type ChatMessage = components['schemas']['ChatMessage'];
 type ChatMessageRequest = components['schemas']['ChatMessageRequest'];
@@ -56,7 +61,6 @@ export {
   API_PATHS,
   MessageRequest,
   MessageResponse,
-  ChatRequest,
   Chat,
   ChatMessage,
   ChatMessageRequest,

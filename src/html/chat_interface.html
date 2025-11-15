@@ -1,6 +1,11 @@
 <!doctype html>
 <html>
   <head>
+    <script>
+      // Server-side data injected by Apps Script
+      const CHAT_ID = <?!= chatId || 'null' ?>;
+      const INITIAL_MESSAGES = <?!= messages || '[]' ?>;
+    </script>
     <base target="_top" />
     <style>
       body {
@@ -134,10 +139,12 @@
             aria-label="Message input"
           ></textarea>
           <div class="btn-row">
-            <button id="select-btn" class="btn" onclick="fillSelectedRange()">
+            <button id="select-btn" class="btn" onclick="addRangeTag('cells', 'Selected range')">
               Select Context
             </button>
-            <button id="add-target-btn" class="btn" onclick="addTargetCell()">Add Target</button>
+            <button id="add-target-btn" class="btn" onclick="addRangeTag('target', 'Added target')">
+              Add Target
+            </button>
           </div>
           <div class="btn-row">
             <button id="send-btn" class="btn" onclick="sendMessage()">Send</button>
@@ -145,97 +152,105 @@
         </div>
       </div>
     </div>
-
-    <script>
-      function appendMessage(text, sender) {
-        const div = document.createElement('div');
-        div.className = `chat-box ${sender}`;
-        div.textContent = text;
-        const chat = document.getElementById('chat');
-        chat.appendChild(div);
-        chat.scrollTop = chat.scrollHeight;
-      }
-
-      const input = document.getElementById('user-input');
-      input.addEventListener('input', function () {
-        this.style.height = 'auto';
-        this.style.height = Math.min(this.scrollHeight, 160) + 'px';
-      });
-
-      function appendToInput(str) {
-        input.value += str;
-        input.dispatchEvent(new Event('input'));
-        input.focus();
-      }
-
-      function fillSelectedRange() {
-        const selectBtn = document.getElementById('select-btn');
-        selectBtn.disabled = true;
-
-        google.script.run
-          .withSuccessHandler(function (selection) {
-            selectBtn.disabled = false;
-            if (!selection) {
-              appendMessage('No range selected in the spreadsheet.', 'bot');
-              return;
-            }
-
-            const sheetName = selection.sheetName;
-            const range = selection.activeRange;
-            const rangeTag = `<cells>'${sheetName}'!${range}</cells>`;
-            appendToInput(rangeTag);
-            appendMessage('Selected range: ' + range, 'bot');
-          })
-          .withFailureHandler(function (error) {
-            selectBtn.disabled = false;
-            appendMessage(`Error: ${error.message || error}`, 'bot');
-          })
-          .getActiveRangeA1Notation();
-      }
-
-      function addTargetCell() {
-        const addTargetBtn = document.getElementById('add-target-btn');
-        addTargetBtn.disabled = true;
-
-        google.script.run
-          .withSuccessHandler(function (selection) {
-            addTargetBtn.disabled = false;
-            if (!selection) {
-              appendMessage('No range selected in the spreadsheet.', 'bot');
-              return;
-            }
-
-            const sheetName = selection.sheetName;
-            const range = selection.activeRange;
-            const targetTag = `<target>'${sheetName}'!${range}</target>`;
-            appendToInput(targetTag);
-            appendMessage('Added target: ' + range, 'bot');
-          })
-          .withFailureHandler(function (error) {
-            addTargetBtn.disabled = false;
-            appendMessage(`Error: ${error.message || error}`, 'bot');
-          })
-          .getActiveRangeA1Notation();
-      }
-
-      function sendMessage() {
-        const sendBtn = document.getElementById('send-btn');
-        const message = input.value.trim();
-        if (!message) return;
-
-        appendMessage(message, 'user');
-        input.value = '';
-        input.style.height = '60px';
-
-        google.script.run
-          .withSuccessHandler(function (response) {
-            appendMessage(response.reply, 'bot');
-          })
-          .withFailureHandler(function (error) {
-            appendMessage(`Error: ${error.message || error}`, 'bot');
-          })
-          .handleMessage(message);
-      }
-    </script>
   </body>
+  <script>
+    /**
+     * Appends a message to the chat display area
+     * @param {string} text - The message text to display
+     * @param {string} sender - The sender type ('user' or 'bot') for styling
+     */
+    function appendMessage(text, sender) {
+      const div = document.createElement('div');
+      div.className = `chat-box ${sender}`;
+      div.textContent = text;
+      const chat = document.getElementById('chat');
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    /**
+     * Load initial messages when the page loads
+     */
+    if (typeof INITIAL_MESSAGES !== 'undefined' && Array.isArray(INITIAL_MESSAGES)) {
+      INITIAL_MESSAGES.forEach(function (msg) {
+        const sender = msg.is_from_user ? 'user' : 'bot';
+        appendMessage(msg.content, sender);
+      });
+    }
+
+    const input = document.getElementById('user-input');
+    input.addEventListener('input', function () {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 160) + 'px';
+    });
+
+    /**
+     * Appends text to the input field and triggers resize
+     * @param {string} str - The string to append to the input field
+     */
+    function appendToInput(str) {
+      input.value += str;
+      input.dispatchEvent(new Event('input'));
+      input.focus();
+    }
+
+    /**
+     * Gets the currently selected range from the spreadsheet and adds it to the input with specified tag
+     * @param {string} tagType - The tag type ('cells' for context or 'target' for output destination)
+     * @param {string} messagePrefix - The prefix for the success message
+     */
+    function addRangeTag(tagType, messagePrefix) {
+      const buttonId = tagType === 'cells' ? 'select-btn' : 'add-target-btn';
+      const button = document.getElementById(buttonId);
+      button.disabled = true;
+
+      google.script.run
+        .withSuccessHandler(function (selection) {
+          button.disabled = false;
+          if (!selection) {
+            appendMessage('No range selected in the spreadsheet.', 'bot');
+            return;
+          }
+
+          const sheetName = selection.sheetName;
+          const range = selection.activeRange;
+          const rangeTag = `<${tagType}>'${sheetName}'!${range}</${tagType}>`;
+          appendToInput(rangeTag);
+          appendMessage(`${messagePrefix}: ${range}`, 'bot');
+        })
+        .withFailureHandler(function (error) {
+          button.disabled = false;
+          appendMessage(`Error: ${error.message || error}`, 'bot');
+        })
+        .getActiveRangeA1Notation();
+    }
+
+    /**
+     * Sends the user's message to the backend for processing
+     * Displays the user message, clears the input, and shows the bot's response
+     */
+    function sendMessage() {
+      const sendBtn = document.getElementById('send-btn');
+      const message = input.value.trim();
+      if (!message) return;
+
+      if (typeof CHAT_ID === 'undefined' || CHAT_ID === null) {
+        appendMessage('Error: No chat ID available', 'bot');
+        return;
+      }
+
+      appendMessage(message, 'user');
+      input.value = '';
+      input.style.height = '60px';
+
+      google.script.run
+        .withSuccessHandler(function (response) {
+          appendMessage(response.reply, 'bot');
+        })
+        .withFailureHandler(function (error) {
+          appendMessage(`Error: ${error.message || error}`, 'bot');
+        })
+        .handleMessage(message, CHAT_ID);
+    }
+  </script>
 </html>

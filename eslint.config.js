@@ -6,7 +6,7 @@ import tsparser from '@typescript-eslint/parser';
 export default [
   // 1. Global ignores must be in their OWN block
   {
-    ignores: ['**/node_modules/**', '**/dist/**', 'src/Code.*', '**/*.html'],
+    ignores: ['**/node_modules/**', '**/dist/**', 'src/Code.*', '**/*.html', '**/types.ts'],
   },
 
   // 2. Global JS/TS recommended rules

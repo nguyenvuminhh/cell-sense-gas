@@ -38,7 +38,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/chat/send-message": {
+    "/chat/{chat_id}/send-message": {
         parameters: {
             query?: never;
             header?: never;
@@ -47,8 +47,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Send Message */
-        post: operations["send_message_chat_send_message_post"];
+        /**
+         * Send Message
+         * @description User sends a message and gets a response from the LLM. Both messages are stored in the DB.
+         */
+        post: operations["send_message_chat__chat_id__send_message_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -95,6 +98,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/chat/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Latest Chat
+         * @description Get the most recently updated chat for the authenticated user.
+         */
+        get: operations["get_latest_chat_chat_latest_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/chat/{chat_id}": {
         parameters: {
             query?: never;
@@ -107,11 +130,7 @@ export interface paths {
          * @description Get a specific chat by ID.
          */
         get: operations["get_chat_chat__chat_id__get"];
-        /**
-         * Update Chat
-         * @description Update a chat's title.
-         */
-        put: operations["update_chat_chat__chat_id__put"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -234,13 +253,6 @@ export interface components {
     schemas: {
         /** Chat */
         Chat: {
-            /**
-             * Title
-             * @default New Chat
-             */
-            title: string;
-            /** User Id */
-            user_id: number;
             /** Id */
             id: number;
             /**
@@ -253,6 +265,18 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+            /**
+             * Title
+             * @default New Chat
+             */
+            title: string;
+            /** User Id */
+            user_id: number;
+            /**
+             * Messages
+             * @default []
+             */
+            messages: components["schemas"]["ChatMessage"][];
         };
         /** ChatMessage */
         ChatMessage: {
@@ -262,8 +286,7 @@ export interface components {
             content: string;
             /** Is From User */
             is_from_user: boolean;
-            /** Model Name */
-            model_name?: string | null;
+            model_name?: components["schemas"]["LLMModels"] | null;
             /** Id */
             id: number;
             /**
@@ -285,18 +308,7 @@ export interface components {
             content: string;
             /** Is From User */
             is_from_user: boolean;
-            /** Model Name */
-            model_name?: string | null;
-        };
-        /** ChatRequest */
-        ChatRequest: {
-            /**
-             * Title
-             * @default New Chat
-             */
-            title: string;
-            /** User Id */
-            user_id: number;
+            model_name?: components["schemas"]["LLMModels"] | null;
         };
         /** FilledRange */
         FilledRange: {
@@ -405,13 +417,15 @@ export interface operations {
             };
         };
     };
-    send_message_chat_send_message_post: {
+    send_message_chat__chat_id__send_message_post: {
         parameters: {
             query: {
                 user_email: string;
             };
             header?: never;
-            path?: never;
+            path: {
+                chat_id: number;
+            };
             cookie?: never;
         };
         requestBody: {
@@ -480,11 +494,38 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ChatRequest"];
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Chat"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
             };
         };
+    };
+    get_latest_chat_chat_latest_get: {
+        parameters: {
+            query: {
+                user_email: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {
@@ -518,43 +559,6 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Chat"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    update_chat_chat__chat_id__put: {
-        parameters: {
-            query: {
-                user_email: string;
-            };
-            header?: never;
-            path: {
-                chat_id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ChatRequest"];
-            };
-        };
         responses: {
             /** @description Successful Response */
             200: {
