@@ -33,6 +33,8 @@ function callApi<T>(
   // eslint-disable-next-line no-undef
   const userEmail = Session.getActiveUser().getEmail();
   query.user_email = userEmail;
+  const now = new Date().toISOString();
+  query.timestamp = now;
 
   const fullUrl = url + (isFetchingSignature ? '' : buildQuery(query));
   // eslint-disable-next-line no-undef

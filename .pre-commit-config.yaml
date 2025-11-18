@@ -22,6 +22,10 @@ repos:
         entry: npx eslint
         language: system
         files: ^src/
+        args:
+          - --cache
+          - --cache-location
+          - node_modules/.cache/eslint/.eslintcache
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.9.0.5

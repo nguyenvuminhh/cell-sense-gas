@@ -3,8 +3,8 @@ import { components, paths } from './types';
 const CONFIG = {
   API_URL: 'https://turgid-unverified-sherril.ngrok-free.dev',
   GCP_SECRET_MANAGER_URL:
-    'https://secretmanager.googleapis.com/v1/projects/${projectId}' +
-    '/secrets/${secretName}/versions/latest:access',
+    'https://secretmanager.googleapis.com/v1/projects/{projectId}' +
+    '/secrets/{secretName}/versions/latest:access',
   PROJECT_NUMBER: '903488684125',
   SECRET_SIGNATURE_PRIVATE_KEY: 'SIGNATURE_PRIVATE_KEY',
 } as const;

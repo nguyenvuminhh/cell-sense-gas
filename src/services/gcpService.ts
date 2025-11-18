@@ -17,8 +17,8 @@ function getSecret(secretName: string): string {
   }
   // eslint-disable-next-line no-undef
   const token = ScriptApp.getOAuthToken();
-  const url = CONFIG.GCP_SECRET_MANAGER_URL.replace('${projectId}', CONFIG.PROJECT_NUMBER).replace(
-    '${secretName}',
+  const url = CONFIG.GCP_SECRET_MANAGER_URL.replace('{projectId}', CONFIG.PROJECT_NUMBER).replace(
+    '{secretName}',
     secretName,
   );
 
