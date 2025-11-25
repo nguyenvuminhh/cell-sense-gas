@@ -17,14 +17,46 @@
         display: flex;
         flex-direction: column;
         font-size: 13px;
+        overflow: hidden;
+      }
+
+      #announcement {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 12px 20px;
+        text-align: center;
+        font-size: 0.9rem;
+        z-index: 100;
+        transform: translateY(-100%);
+        transition: transform 0.3s ease;
+      }
+
+      #announcement.show {
+        transform: translateY(0);
+      }
+
+      #announcement.error {
+        background: #dc2626;
+        color: white;
+      }
+
+      #announcement.success {
+        background: #059669;
+        color: white;
+      }
+
+      #announcement.info {
+        background: #3b82f6;
+        color: white;
       }
 
       #container {
         flex: 1;
         display: flex;
         flex-direction: column;
-        padding: 20px;
-        box-sizing: border-box;
+        overflow: hidden;
       }
 
       .chat-box {
@@ -57,18 +89,22 @@
       #chat {
         flex: 1;
         overflow-y: auto;
+        padding: 20px;
         padding-bottom: 12px;
         display: flex;
         flex-direction: column;
       }
 
       #input-area {
-        margin-top: auto;
+        position: sticky;
+        bottom: 0;
         display: flex;
         flex-direction: column;
-        padding-top: 12px;
+        padding: 12px 20px;
+        background: #0f172a;
         border-top: 1px solid rgba(148, 163, 184, 0.3);
         align-items: center;
+        z-index: 10;
       }
 
       #chat-input-group {
@@ -113,11 +149,28 @@
         cursor: pointer;
         font-size: 0.7rem;
         min-width: 80px;
-        height: 30px;
+        height: 28px;
+      }
+
+      #model-selector {
+        flex: 1;
+        background: #374151;
+        color: white;
+        border: 1px solid #4b5563;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 0.7rem;
+        cursor: pointer;
+        height: 28px;
+      }
+
+      #model-selector:focus {
+        outline: none;
+        border-color: #3b82f6;
       }
 
       #select-btn {
-        background: #1f2937;
+        background: #059669;
       }
       #add-target-btn {
         background: #059669;
@@ -128,16 +181,12 @@
     </style>
   </head>
   <body>
+    <div id="announcement"></div>
     <div id="container">
       <div id="chat"></div>
 
       <div id="input-area">
         <div id="chat-input-group">
-          <textarea
-            id="user-input"
-            placeholder="Ask something..."
-            aria-label="Message input"
-          ></textarea>
           <div class="btn-row">
             <button id="select-btn" class="btn" onclick="addRangeTag('cells', 'Selected range')">
               Select Context
@@ -146,7 +195,17 @@
               Add Target
             </button>
           </div>
+          <textarea
+            id="user-input"
+            placeholder="Ask something..."
+            aria-label="Message input"
+          ></textarea>
           <div class="btn-row">
+            <select id="model-selector" aria-label="Model selection">
+              <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
+              <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash</option>
+              <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+            </select>
             <button id="send-btn" class="btn" onclick="sendMessage()">Send</button>
           </div>
         </div>
@@ -154,6 +213,22 @@
     </div>
   </body>
   <script>
+    /**
+     * Shows a time-limited announcement at the top of the page
+     * @param {string} message - The message to display
+     * @param {string} type - The type of announcement ('error', 'success', or 'info')
+     * @param {number} duration - Duration in milliseconds (default: 3000)
+     */
+    function showAnnouncement(message, type = 'info', duration = 3000) {
+      const announcement = document.getElementById('announcement');
+      announcement.textContent = message;
+      announcement.className = `show ${type}`;
+
+      setTimeout(function () {
+        announcement.className = announcement.className.replace('show', '');
+      }, duration);
+    }
+
     /**
      * Appends a message to the chat display area
      * @param {string} text - The message text to display
@@ -208,7 +283,7 @@
         .withSuccessHandler(function (selection) {
           button.disabled = false;
           if (!selection) {
-            appendMessage('No range selected in the spreadsheet.', 'bot');
+            showAnnouncement('No range selected in the spreadsheet.', 'error');
             return;
           }
 
@@ -216,11 +291,11 @@
           const range = selection.activeRange;
           const rangeTag = `<${tagType}>'${sheetName}'!${range}</${tagType}>`;
           appendToInput(rangeTag);
-          appendMessage(`${messagePrefix}: ${range}`, 'bot');
+          showAnnouncement(`${messagePrefix}: ${range}`, 'success');
         })
         .withFailureHandler(function (error) {
           button.disabled = false;
-          appendMessage(`Error: ${error.message || error}`, 'bot');
+          showAnnouncement(`Error: ${error.message || error}`, 'error');
         })
         .getActiveRangeA1Notation();
     }
@@ -231,26 +306,32 @@
      */
     function sendMessage() {
       const sendBtn = document.getElementById('send-btn');
+      const modelSelector = document.getElementById('model-selector');
       const message = input.value.trim();
       if (!message) return;
 
       if (typeof CHAT_ID === 'undefined' || CHAT_ID === null) {
-        appendMessage('Error: No chat ID available', 'bot');
+        showAnnouncement('Error: No chat ID available', 'error');
         return;
       }
 
+      const selectedModel = modelSelector.value;
       appendMessage(message, 'user');
       input.value = '';
       input.style.height = '60px';
 
       google.script.run
         .withSuccessHandler(function (response) {
-          appendMessage(response.reply, 'bot');
+          if (response.error) {
+            showAnnouncement(`Error: ${response.error}`, 'error', 5000);
+          } else {
+            appendMessage(response.reply, 'bot');
+          }
         })
         .withFailureHandler(function (error) {
-          appendMessage(`Error: ${error.message || error}`, 'bot');
+          showAnnouncement(`Error: ${error.message || error}`, 'error', 5000);
         })
-        .handleMessage(message, CHAT_ID);
+        .handleMessage(message, CHAT_ID, selectedModel);
     }
   </script>
 </html>

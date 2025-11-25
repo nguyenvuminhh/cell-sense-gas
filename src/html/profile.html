@@ -1,0 +1,425 @@
+<!doctype html>
+<html>
+  <head>
+    <script>
+      // Server-side data injected by Apps Script
+      const USER_DATA = <?!= userData || '{}' ?>;
+      const QUOTA_DATA = <?!= quotaData || 'null' ?>;
+    </script>
+    <base target="_top" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #0f172a;
+        color: white;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        font-size: 13px;
+      }
+
+      #container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        box-sizing: border-box;
+        overflow-y: auto;
+      }
+
+      h2 {
+        margin: 0 0 20px 0;
+        font-size: 1.3rem;
+        font-weight: 600;
+      }
+
+      .section {
+        background: #1f2937;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+
+      .section-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: #e5e7eb;
+      }
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #374151;
+      }
+
+      .info-row:last-child {
+        border-bottom: none;
+      }
+
+      .info-label {
+        font-size: 0.85rem;
+        color: #9ca3af;
+      }
+
+      .info-value {
+        font-size: 0.9rem;
+        color: #e5e7eb;
+        font-weight: 500;
+      }
+
+      .api-key-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .api-key-display {
+        background: #374151;
+        padding: 12px;
+        border-radius: 6px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        word-break: break-all;
+        color: #d1d5db;
+      }
+
+      .api-key-input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #4b5563;
+        background: #374151;
+        color: #e5e7eb;
+        font-size: 0.9rem;
+        box-sizing: border-box;
+        font-family: 'Courier New', monospace;
+      }
+
+      .api-key-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .btn {
+        flex: 1;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 16px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: background 0.2s;
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .btn-primary {
+        background: #3b82f6;
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        background: #2563eb;
+      }
+
+      .btn-secondary {
+        background: #6b7280;
+      }
+
+      .btn-secondary:hover:not(:disabled) {
+        background: #4b5563;
+      }
+
+      .btn-danger {
+        background: #dc2626;
+      }
+
+      .btn-danger:hover:not(:disabled) {
+        background: #b91c1c;
+      }
+
+      .no-key-message {
+        color: #9ca3af;
+        font-size: 0.9rem;
+        font-style: italic;
+      }
+
+      .message {
+        padding: 10px 12px;
+        border-radius: 6px;
+        margin-bottom: 12px;
+        font-size: 0.85rem;
+      }
+
+      .message-success {
+        background: #065f46;
+        color: #d1fae5;
+      }
+
+      .message-error {
+        background: #991b1b;
+        color: #fecaca;
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <div id="message-container"></div>
+
+      <div class="section">
+        <div class="section-title">Account Information</div>
+        <div class="info-row">
+          <span class="info-label">Email</span>
+          <span class="info-value" id="user-email">-</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Member Since</span>
+          <span class="info-value" id="created-at">-</span>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Gemini API Key</div>
+        <div class="api-key-container">
+          <div id="api-key-view">
+            <div id="no-key-message" class="no-key-message hidden">No API key configured</div>
+            <div id="api-key-display" class="api-key-display hidden"></div>
+            <div class="button-group">
+              <button class="btn btn-secondary" onclick="showEditApiKey()">
+                <span id="edit-key-text">Set API Key</span>
+              </button>
+              <button id="delete-key-btn" class="btn btn-danger hidden" onclick="deleteApiKey()">
+                Delete Key
+              </button>
+            </div>
+          </div>
+
+          <div id="api-key-edit" class="hidden">
+            <input
+              type="text"
+              id="api-key-input"
+              class="api-key-input"
+              placeholder="Enter your Gemini API key"
+            />
+            <div class="button-group">
+              <button class="btn btn-primary" onclick="saveApiKey()">Save</button>
+              <button class="btn btn-secondary" onclick="cancelEditApiKey()">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Free Quota</div>
+        <div class="info-row">
+          <span class="info-label">Remaining Quota</span>
+          <span class="info-value" id="quota-remaining">-</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Next Reset</span>
+          <span class="info-value" id="quota-reset">-</span>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    let isEditing = false;
+
+    /**
+     * Format date to readable string
+     */
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    }
+
+    /**
+     * Format date and time to readable string
+     */
+    function formatDateTime(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    }
+
+    /**
+     * Show message to user
+     */
+    function showMessage(text, isError) {
+      const container = document.getElementById('message-container');
+      const message = document.createElement('div');
+      message.className = 'message ' + (isError ? 'message-error' : 'message-success');
+      message.textContent = text;
+      container.appendChild(message);
+
+      setTimeout(function () {
+        message.remove();
+      }, 5000);
+    }
+
+    /**
+     * Load user data into the page
+     */
+    function loadUserData() {
+      if (typeof USER_DATA !== 'undefined' && USER_DATA.email) {
+        document.getElementById('user-email').textContent = USER_DATA.email;
+        document.getElementById('created-at').textContent = USER_DATA.created_at
+          ? formatDate(USER_DATA.created_at)
+          : '-';
+
+        // Handle API key display
+        const hasKey = USER_DATA.gemini_api_key && USER_DATA.gemini_api_key.length > 0;
+
+        if (hasKey) {
+          document.getElementById('api-key-display').textContent = USER_DATA.gemini_api_key;
+          document.getElementById('api-key-display').classList.remove('hidden');
+          document.getElementById('no-key-message').classList.add('hidden');
+          document.getElementById('delete-key-btn').classList.remove('hidden');
+          document.getElementById('edit-key-text').textContent = 'Change API Key';
+        } else {
+          document.getElementById('api-key-display').classList.add('hidden');
+          document.getElementById('no-key-message').classList.remove('hidden');
+          document.getElementById('delete-key-btn').classList.add('hidden');
+          document.getElementById('edit-key-text').textContent = 'Set API Key';
+        }
+      }
+
+      // Load quota data
+      if (typeof QUOTA_DATA !== 'undefined' && QUOTA_DATA !== null) {
+        document.getElementById('quota-remaining').textContent =
+          QUOTA_DATA.free_quota_remaining || '0';
+        document.getElementById('quota-reset').textContent = QUOTA_DATA.next_reset
+          ? formatDateTime(QUOTA_DATA.next_reset)
+          : '-';
+      }
+    }
+
+    /**
+     * Show API key edit form
+     */
+    function showEditApiKey() {
+      if (isEditing) return;
+      isEditing = true;
+
+      document.getElementById('api-key-view').classList.add('hidden');
+      document.getElementById('api-key-edit').classList.remove('hidden');
+      document.getElementById('api-key-input').value = '';
+      document.getElementById('api-key-input').focus();
+    }
+
+    /**
+     * Cancel API key editing
+     */
+    function cancelEditApiKey() {
+      isEditing = false;
+      document.getElementById('api-key-view').classList.remove('hidden');
+      document.getElementById('api-key-edit').classList.add('hidden');
+    }
+
+    /**
+     * Save API key
+     */
+    function saveApiKey() {
+      const apiKey = document.getElementById('api-key-input').value.trim();
+
+      if (!apiKey) {
+        showMessage('Please enter an API key', true);
+        return;
+      }
+
+      const buttons = document.querySelectorAll('.btn');
+      buttons.forEach(function (btn) {
+        btn.disabled = true;
+      });
+
+      google.script.run
+        .withSuccessHandler(function (result) {
+          buttons.forEach(function (btn) {
+            btn.disabled = false;
+          });
+
+          if (result.error) {
+            showMessage('Error: ' + result.error, true);
+          } else {
+            showMessage('API key updated successfully', false);
+            // Update the displayed data
+            USER_DATA.gemini_api_key = result.gemini_api_key;
+            cancelEditApiKey();
+            loadUserData();
+          }
+        })
+        .withFailureHandler(function (error) {
+          buttons.forEach(function (btn) {
+            btn.disabled = false;
+          });
+          showMessage('Error: ' + (error.message || error), true);
+        })
+        .updateUserApiKey(apiKey);
+    }
+
+    /**
+     * Delete API key
+     */
+    function deleteApiKey() {
+      if (!confirm('Are you sure you want to delete your API key?')) {
+        return;
+      }
+
+      const buttons = document.querySelectorAll('.btn');
+      buttons.forEach(function (btn) {
+        btn.disabled = true;
+      });
+
+      google.script.run
+        .withSuccessHandler(function (result) {
+          buttons.forEach(function (btn) {
+            btn.disabled = false;
+          });
+
+          if (result.error) {
+            showMessage('Error: ' + result.error, true);
+          } else {
+            showMessage('API key deleted successfully', false);
+            // Update the displayed data
+            USER_DATA.gemini_api_key = null;
+            loadUserData();
+          }
+        })
+        .withFailureHandler(function (error) {
+          buttons.forEach(function (btn) {
+            btn.disabled = false;
+          });
+          showMessage('Error: ' + (error.message || error), true);
+        })
+        .updateUserApiKey('');
+    }
+
+    // Load user data on page load
+    loadUserData();
+  </script>
+</html>

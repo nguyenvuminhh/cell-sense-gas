@@ -6,6 +6,7 @@ import {
   getChat,
 } from './services/chatService';
 import { handleMessage } from './services/messageService';
+import { getCurrentUser, updateApiKey, getUserQuota } from './services/userService';
 
 /**
  * Main entry point - Creates the CellSense menu on spreadsheet open
@@ -13,9 +14,11 @@ import { handleMessage } from './services/messageService';
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('CellSense')
-    .addItem('Most Recent Chat', 'showLatestChat')
-    .addItem('Chat History', 'showChatList')
+    .addItem('My Profile', 'showProfile')
+    .addSeparator()
     .addItem('New Chat', 'createNewChat')
+    .addItem('Chat History', 'showChatList')
+    .addItem('Most Recent Chat', 'showLatestChat')
     .addToUi();
 }
 
@@ -83,4 +86,42 @@ function createNewChat() {
   showLatestChat();
 }
 
-export { onOpen, showLatestChat, showChatList, createNewChat, openChatById, handleMessage };
+/**
+ * Show the user profile sidebar
+ */
+function showProfile() {
+  const userResponse = getCurrentUser();
+
+  if ('error' in userResponse) {
+    SpreadsheetApp.getUi().alert(`Failed to load profile: ${userResponse.error}`);
+    return;
+  }
+
+  const quotaResponse = getUserQuota();
+  const quota = 'error' in quotaResponse ? null : quotaResponse;
+
+  const template = HtmlService.createTemplateFromFile('html/profile');
+  template.userData = JSON.stringify(userResponse);
+  template.quotaData = JSON.stringify(quota);
+
+  const html = template.evaluate().setTitle('My Profile').setWidth(450);
+  SpreadsheetApp.getUi().showSidebar(html);
+}
+
+/**
+ * Update user's API key
+ */
+function updateUserApiKey(apiKey: string) {
+  return updateApiKey(apiKey);
+}
+
+export {
+  onOpen,
+  showLatestChat,
+  showChatList,
+  createNewChat,
+  openChatById,
+  showProfile,
+  updateUserApiKey,
+  handleMessage,
+};

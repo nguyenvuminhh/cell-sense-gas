@@ -12,6 +12,7 @@ const CONFIG = {
 const API_PATHS = {
   PING: '/ping' as keyof paths,
   ROOT: '/' as keyof paths,
+  SUPPORTED_MODELS: '/supported-models' as keyof paths,
   CHAT_SEND_MESSAGE: '/chat/{chat_id}/send-message' as keyof paths,
   CHAT_LIST: '/chat/list' as keyof paths,
   CHAT_NEW: '/chat/new' as keyof paths,
@@ -19,6 +20,9 @@ const API_PATHS = {
   CHAT_BY_ID: '/chat/{chat_id}' as keyof paths,
   CHAT_MESSAGES: '/chat/{chat_id}/messages' as keyof paths,
   DELETE_MESSAGE: '/chat/messages/{message_id}' as keyof paths,
+  USER_ME: '/user/me' as keyof paths,
+  USER_QUOTA: '/user/quota' as keyof paths,
+  USER_API_KEY: '/user/api-key' as keyof paths,
   ERROR_500: '/error/500' as keyof paths,
   ERROR_404: '/error/404' as keyof paths,
   ERROR_400: '/error/400' as keyof paths,
@@ -38,6 +42,9 @@ type LLMModels = components['schemas']['LLMModels'];
 type LLMProviders = components['schemas']['LLMProviders'];
 type ValidationError = components['schemas']['ValidationError'];
 type HTTPValidationError = components['schemas']['HTTPValidationError'];
+type UserWithTruncatedApiKey = components['schemas']['UserWithTruncatedApiKey'];
+type ApiKeyUpdateRequest = components['schemas']['ApiKeyUpdateRequest'];
+type FreeUserQuota = components['schemas']['FreeUserQuota'];
 
 // Custom app-specific types (not in backend schema)
 interface ApiErrorResponse {
@@ -70,6 +77,9 @@ export {
   LLMProviders,
   ValidationError,
   HTTPValidationError,
+  UserWithTruncatedApiKey,
+  ApiKeyUpdateRequest,
+  FreeUserQuota,
   ApiErrorResponse,
   ApiResponse,
   ActiveRangeInfo,

@@ -21,8 +21,6 @@ export {
   getChat,
   deleteChat,
   getChatMessages,
-  createChatMessage,
-  deleteChatMessage,
 } from './chatService';
 
 // GCP Service
@@ -33,3 +31,9 @@ export { signPayload } from './cryptoService';
 
 // Message Service
 export { handleMessage } from './messageService';
+
+// User Service
+export { getCurrentUser, updateApiKey, getUserQuota } from './userService';
+
+// Model Service
+export { getSupportedModels } from './modelService';

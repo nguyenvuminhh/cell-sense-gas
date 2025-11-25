@@ -38,6 +38,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/supported-models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Supported Models */
+        get: operations["get_supported_models_supported_models_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/chat/{chat_id}/send-message": {
         parameters: {
             query?: never;
@@ -47,10 +64,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Send Message
-         * @description User sends a message and gets a response from the LLM. Both messages are stored in the DB.
-         */
+        /** Send Message */
         post: operations["send_message_chat__chat_id__send_message_post"];
         delete?: never;
         options?: never;
@@ -65,10 +79,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * Get Chat List
-         * @description Get all chats for the authenticated user.
-         */
+        /** Get Chat List */
         get: operations["get_chat_list_chat_list_get"];
         put?: never;
         post?: never;
@@ -87,10 +98,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Create New Chat
-         * @description Create a new chat for the authenticated user.
-         */
+        /** Create New Chat */
         post: operations["create_new_chat_chat_new_post"];
         delete?: never;
         options?: never;
@@ -105,10 +113,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * Get Latest Chat
-         * @description Get the most recently updated chat for the authenticated user.
-         */
+        /** Get Latest Chat */
         get: operations["get_latest_chat_chat_latest_get"];
         put?: never;
         post?: never;
@@ -125,10 +130,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * Get Chat
-         * @description Get a specific chat by ID.
-         */
+        /** Get Chat */
         get: operations["get_chat_chat__chat_id__get"];
         put?: never;
         post?: never;
@@ -145,17 +147,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * Get Chat Messages
-         * @description Get all messages for a specific chat.
-         */
+        /** Get Chat Messages */
         get: operations["get_chat_messages_chat__chat_id__messages_get"];
         put?: never;
-        /**
-         * Create Message
-         * @description Add a new message to a chat.
-         */
-        post: operations["create_message_chat__chat_id__messages_post"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -247,10 +242,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/user/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Current User */
+        get: operations["get_current_user_user_me_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/user/quota": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Free User Quota */
+        get: operations["get_free_user_quota_user_quota_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/user/api-key": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Api Key */
+        patch: operations["update_api_key_user_api_key_patch"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ApiKeyUpdateRequest */
+        ApiKeyUpdateRequest: {
+            /** Gemini Api Key */
+            gemini_api_key: string;
+        };
         /** Chat */
         Chat: {
             /** Id */
@@ -287,6 +338,10 @@ export interface components {
             /** Is From User */
             is_from_user: boolean;
             model_name?: components["schemas"]["LLMModels"] | null;
+            /** Full User Prompt */
+            full_user_prompt?: string | null;
+            /** Full Model Response */
+            full_model_response?: string | null;
             /** Id */
             id: number;
             /**
@@ -300,16 +355,6 @@ export interface components {
              */
             updated_at: string;
         };
-        /** ChatMessageRequest */
-        ChatMessageRequest: {
-            /** Chat Id */
-            chat_id: number;
-            /** Content */
-            content: string;
-            /** Is From User */
-            is_from_user: boolean;
-            model_name?: components["schemas"]["LLMModels"] | null;
-        };
         /** FilledRange */
         FilledRange: {
             /** Sheet Name */
@@ -318,6 +363,30 @@ export interface components {
             range: string;
             /** R1C1 Value */
             r1c1_value: string;
+        };
+        /** FreeUserQuota */
+        FreeUserQuota: {
+            /** User Id */
+            user_id: number;
+            /** Free Quota Remaining */
+            free_quota_remaining: number;
+            /**
+             * Next Reset
+             * Format: date-time
+             */
+            next_reset: string;
+            /** Id */
+            id: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -358,6 +427,25 @@ export interface components {
             sheet_name_and_range: string;
             /** Cell Values */
             cell_values: unknown[][];
+        };
+        /** UserWithTruncatedApiKey */
+        UserWithTruncatedApiKey: {
+            /** Email */
+            email: string;
+            /** Gemini Api Key */
+            gemini_api_key?: string | null;
+            /** Id */
+            id: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
         };
         /** ValidationError */
         ValidationError: {
@@ -413,6 +501,29 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    get_supported_models_supported_models_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": [
+                        components["schemas"]["LLMProviders"],
+                        components["schemas"]["LLMModels"]
+                    ][];
                 };
             };
         };
@@ -613,43 +724,6 @@ export interface operations {
             };
         };
     };
-    create_message_chat__chat_id__messages_post: {
-        parameters: {
-            query: {
-                user_email: string;
-            };
-            header?: never;
-            path: {
-                chat_id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ChatMessageRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ChatMessage"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
     get_error_500_error_500_get: {
         parameters: {
             query?: never;
@@ -746,6 +820,103 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    get_current_user_user_me_get: {
+        parameters: {
+            query: {
+                user_email: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserWithTruncatedApiKey"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_free_user_quota_user_quota_get: {
+        parameters: {
+            query: {
+                user_email: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FreeUserQuota"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_api_key_user_api_key_patch: {
+        parameters: {
+            query: {
+                user_email: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApiKeyUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserWithTruncatedApiKey"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

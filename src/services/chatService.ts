@@ -2,15 +2,7 @@
  * Chat Service - Chat and message CRUD operations
  */
 
-import {
-  CONFIG,
-  API_PATHS,
-  Chat,
-  ChatMessage,
-  ChatMessageRequest,
-  ApiResponse,
-  LLMModels,
-} from '../config';
+import { CONFIG, API_PATHS, Chat, ChatMessage, ApiResponse } from '../config';
 import { callApi } from './apiService';
 
 /**
@@ -64,42 +56,4 @@ function getChatMessages(chatId: number): ApiResponse<ChatMessage[]> {
   return response;
 }
 
-/**
- * Create a message in a chat
- */
-function createChatMessage(
-  chatId: number,
-  content: string,
-  isFromUser: boolean,
-  modelName?: LLMModels,
-): ApiResponse<ChatMessage> {
-  const payload: ChatMessageRequest = {
-    chat_id: chatId,
-    content,
-    is_from_user: isFromUser,
-    model_name: modelName || null,
-  };
-  const path = API_PATHS.CHAT_MESSAGES.replace('{chat_id}', chatId.toString());
-  const response = callApi<ChatMessage>('POST', `${CONFIG.API_URL}${path}`, payload);
-  return response;
-}
-
-/**
- * Delete a message
- */
-function deleteChatMessage(messageId: number): ApiResponse<{ message: string }> {
-  const path = API_PATHS.DELETE_MESSAGE.replace('{message_id}', messageId.toString());
-  const response = callApi<{ message: string }>('DELETE', `${CONFIG.API_URL}${path}`);
-  return response;
-}
-
-export {
-  getChatList,
-  getLatestChat,
-  createChat,
-  getChat,
-  deleteChat,
-  getChatMessages,
-  createChatMessage,
-  deleteChatMessage,
-};
+export { getChatList, getLatestChat, createChat, getChat, deleteChat, getChatMessages };

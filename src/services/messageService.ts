@@ -7,29 +7,48 @@ import { callApi } from './apiService';
 import { extractRangesFromMessage, fillCellsWithFormula } from './sheetUtils';
 
 interface HandleMessageResponse {
-  reply: string;
+  reply: string | undefined;
+  error: string | undefined;
 }
 
 /**
  * Handle user message and interact with backend API
  * @param message - User message text
  * @param chatId - The chat ID to send the message to
+ * @param model - Optional model to use (defaults to gemini-2.5-flash-lite)
  */
-function handleMessage(message: string, chatId: number): HandleMessageResponse {
+function handleMessage(
+  message: string,
+  chatId: number,
+  model: 'gemini-2.5-flash-lite' | 'gemini-2.5-flash' | 'gemini-2.5-pro',
+): HandleMessageResponse {
   const selectedRanges = extractRangesFromMessage(message);
 
   const payload: MessageRequest = {
     message,
     selected_ranges: selectedRanges,
     llm_provider: 'google',
-    llm_model: 'gemini-2.5-flash-lite',
+    llm_model: model,
   };
 
   const path = API_PATHS.CHAT_SEND_MESSAGE.replace('{chat_id}', chatId.toString());
   const response = callApi<MessageResponse>('POST', `${CONFIG.API_URL}${path}`, payload);
 
   if ('error' in response) {
-    return { reply: `Something went wrong: ${response.error}` };
+    let errorText = response.error;
+    try {
+      const jsonMatch = errorText.match(/\{.*\}$/s);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        if (parsed && typeof parsed === 'object' && 'detail' in parsed) {
+          errorText = parsed.detail;
+        }
+      }
+    } catch {
+      // eslint-disable-next-line no-empty
+    }
+
+    return { error: errorText, reply: undefined };
   }
 
   try {
@@ -41,10 +60,10 @@ function handleMessage(message: string, chatId: number): HandleMessageResponse {
     }
   } catch (err) {
     const error = err as Error;
-    return { reply: 'Error while filling cells: ' + error.message };
+    return { error: 'Error while filling cells: ' + error.message, reply: undefined };
   }
 
-  return { reply: response.message || 'No reply from server.' };
+  return { reply: response.message || 'No reply from server.', error: undefined };
 }
 
 export { handleMessage };

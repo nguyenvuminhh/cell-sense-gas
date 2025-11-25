@@ -12,6 +12,9 @@ export {
   LLMProviders,
   ValidationError,
   HTTPValidationError,
+  UserWithTruncatedApiKey,
+  ApiKeyUpdateRequest,
+  FreeUserQuota,
   ApiErrorResponse,
   ApiResponse,
   ActiveRangeInfo,
@@ -33,11 +36,21 @@ export {
   getChat,
   deleteChat,
   getChatMessages,
-  createChatMessage,
-  deleteChatMessage,
   handleMessage,
+  getCurrentUser,
+  updateApiKey,
+  getUserQuota,
+  getSupportedModels,
   getSecret,
   signPayload,
 } from './services';
 
-export { onOpen, showLatestChat, showChatList, createNewChat, openChatById } from './Code';
+export {
+  onOpen,
+  showLatestChat,
+  showChatList,
+  createNewChat,
+  openChatById,
+  showProfile,
+  updateUserApiKey,
+} from './Code';
