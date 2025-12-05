@@ -19,3 +19,16 @@ clasp_push:
 	cp appsscript.json dist/appsscript.json && \
 	cd dist && \
 	clasp push
+
+.PHONY: encrypt_credentials
+encrypt_credentials:
+	gpg --batch --yes \
+		--passphrase-file pass.txt \
+		--symmetric --cipher-algo AES256 \
+		-o .clasprc.json.gpg ~/.clasprc.json
+
+.PHONY: decrypt_credentials
+decrypt_credentials:
+	gpg --batch --yes \
+		--passphrase-file pass.txt \
+		--decrypt -o .clasprc.json .clasprc.json.gpg
