@@ -31,6 +31,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+    needs: precommit
 
     steps:
       - name: Checkout repository
@@ -47,6 +48,10 @@ jobs:
       - name: Write service account credentials
         run: |
           echo '${{ secrets.GCP_SA_KEY }}' > credentials.json
+
+      - name: DEBUG Show credentials file
+        run: |
+          cat credentials.json
 
       - name: Login to clasp (service account)
         run: |
