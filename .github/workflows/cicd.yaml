@@ -36,7 +36,7 @@ jobs:
         env:
           API_URL: ${{ vars.API_URL }}
         run: |
-          make clasp_push
+          make clasp_push DEV_OR_PROD=prod
 
       - name: Create new version
         id: version

@@ -21,7 +21,7 @@ clasp_push:
 	node scripts/replace-api-url-placeholder.cjs && \
 	echo "Copying other files..." && \
 	cp -r src/html/ dist/html && \
-	cp .clasp.json dist/.clasp.json && \
+	cp .clasp.$(DEV_OR_PROD).json dist/.clasp.json && \
 	cp appsscript.json dist/appsscript.json && \
 	echo "Pushing to Apps Script project..." && \
 	cd dist && \
