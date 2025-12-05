@@ -10,13 +10,18 @@ export_openapi_types:
 # ----------- DEPLOYMENT -----------
 .PHONY: clasp_push
 clasp_push:
+	echo "Re-initializing dist..." && \
 	rm -rf dist && \
 	mkdir dist && \
+	echo "Building with esbuild..." && \
 	npx esbuild src/index.ts --bundle --outfile=dist/Code.js --format=esm --target=es2020 && \
+	echo "Removing exports..." && \
 	node scripts/remove-exports.cjs && \
+	echo "Copying other files..." && \
 	cp -r src/html/ dist/html && \
 	cp .clasp.json dist/.clasp.json && \
 	cp appsscript.json dist/appsscript.json && \
+	echo "Pushing to Apps Script project..." && \
 	cd dist && \
 	clasp push
 
