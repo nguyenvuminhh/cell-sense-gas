@@ -48,5 +48,6 @@ jobs:
       - name: Update deployment to latest version
         run: |
           clasp deploy \
-           "${{ steps.version.outputs.version }}" \
-           "Auto deploy from GitHub Actions - $GITHUB_SHA"
+            -i ${{ secrets.DEPLOYMENT_ID }} \
+            -V "${{ steps.version.outputs.version }}" \
+            -d "Auto deploy from GitHub Actions - $GITHUB_SHA"
