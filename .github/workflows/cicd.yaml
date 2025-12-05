@@ -34,7 +34,7 @@ jobs:
 
       - name: Push code to Apps Script
         env:
-          API_URL: ${{ secrets.API_URL }}
+          API_URL: ${{ vars.API_URL }}
         run: |
           make clasp_push
 
