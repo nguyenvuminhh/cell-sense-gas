@@ -38,10 +38,10 @@ repos:
       - id: markdownlint
         args: ['--fix']
 
-  - repo: local
-    hooks:
-      - id: generate-openapi-types
-        name: Generate OpenAPI Types
-        entry: make export_openapi_types
-        language: system
-        pass_filenames: false
+  # - repo: local
+  #   hooks:
+  #     - id: generate-openapi-types
+  #       name: Generate OpenAPI Types
+  #       entry: make export_openapi_types
+  #       language: system
+  #       pass_filenames: false
