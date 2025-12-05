@@ -1,3 +1,4 @@
+# source: https://github.com/gkukurin/automate_apps_script_deployment/blob/main/.github/workflows/config.yml
 name: CICD Pipeline
 
 on:
@@ -26,19 +27,10 @@ jobs:
       - name: Install clasp
         run: npm install -g @google/clasp
 
-      - name: Write service account credentials
-        run: |
-          echo '${{ secrets.GCP_SA_KEY }}' > credentials.json
-
-      - name: DEBUG Show credentials file
-        run: |
-          cat credentials.json
-
-      - name: Login to clasp (service account)
-        run: |
-          clasp login --creds credentials.json --no-localhost
-      # If your Apps Script project is in a subfolder (e.g. ./apps-script),
-      # add "working-directory: ./apps-script" to the steps below.
+      - run: |
+          gpg \
+            --quiet --batch --yes --decrypt --passphrase="${{ secrets.CLASP_SECRET }}" \
+            --output $HOME/.clasprc.json .clasprc.json.gpg
 
       - name: Push code to Apps Script
         run: |
