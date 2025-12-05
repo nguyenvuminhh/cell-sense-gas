@@ -33,6 +33,8 @@ jobs:
             --output $HOME/.clasprc.json .clasprc.json.gpg
 
       - name: Push code to Apps Script
+        env:
+          API_URL: ${{ secrets.API_URL }}
         run: |
           make clasp_push
 
