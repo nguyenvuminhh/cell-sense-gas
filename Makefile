@@ -8,8 +8,8 @@ export_openapi_types:
 	npx openapi-typescript http://localhost:8000/openapi.json --output src/types.ts
 
 # ----------- DEPLOYMENT -----------
-.PHONY: gcloud_deploy_to_app_script
-gcloud_deploy_to_app_script:
+.PHONY: clasp_push
+clasp_push:
 	rm -rf dist && \
 	mkdir dist && \
 	npx esbuild src/index.ts --bundle --outfile=dist/Code.js --format=esm --target=es2020 && \
