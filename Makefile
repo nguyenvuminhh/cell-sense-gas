@@ -17,6 +17,8 @@ clasp_push:
 	npx esbuild src/index.ts --bundle --outfile=dist/Code.js --format=esm --target=es2020 && \
 	echo "Removing exports..." && \
 	node scripts/remove-exports.cjs && \
+	echo "Replacing API URL placeholder..." && \
+	node scripts/replace-api-url-placeholder.cjs && \
 	echo "Copying other files..." && \
 	cp -r src/html/ dist/html && \
 	cp .clasp.json dist/.clasp.json && \
