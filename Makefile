@@ -1,3 +1,9 @@
+# Load .env file if it exists
+ifneq (,$(wildcard .env))
+	include .env
+	export
+endif
+
 # ----------- PRE-COMMIT -----------
 .PHONY: precommit
 precommit:
@@ -8,6 +14,14 @@ export_openapi_types:
 	npx openapi-typescript http://localhost:8000/openapi.json --output src/types.ts
 
 # ----------- DEPLOYMENT -----------
+.PHONY: clasp_push_dev
+clasp_push_dev:
+	$(MAKE) DEV_OR_PROD=dev clasp_push
+	
+.PHONY: clasp_push_prod
+clasp_push_prod:
+	$(MAKE) DEV_OR_PROD=prod clasp_push
+
 .PHONY: clasp_push
 clasp_push:
 	echo "Re-initializing dist..." && \
