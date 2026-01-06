@@ -38,6 +38,10 @@ jobs:
         run: |
           make clasp_push_prod
 
+      - name: Copy .clasp.prod.json to .clasp.json
+        run: |
+          cp .clasp.prod.json .clasp.json
+
       - name: Create new version
         id: version
         run: |
