@@ -41,8 +41,6 @@ export {
   updateApiKey,
   getUserQuota,
   getSupportedModels,
-  getSecret,
-  signPayload,
 } from './services';
 
 export {

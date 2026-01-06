@@ -23,12 +23,6 @@ export {
   getChatMessages,
 } from './chatService';
 
-// GCP Service
-export { getSecret } from './gcpService';
-
-// Crypto Service
-export { signPayload } from './cryptoService';
-
 // Message Service
 export { handleMessage } from './messageService';
 
