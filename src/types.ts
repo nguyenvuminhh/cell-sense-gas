@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+    "/healthz": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Healthz */
+        get: operations["healthz_healthz_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/ping": {
         parameters: {
             query?: never;
@@ -30,6 +47,23 @@ export interface paths {
         };
         /** Get Root */
         get: operations["get_root__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/db": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Db */
+        get: operations["get_db_db_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -300,7 +334,11 @@ export interface components {
         /** ApiKeyUpdateRequest */
         ApiKeyUpdateRequest: {
             /** Gemini Api Key */
-            gemini_api_key: string;
+            gemini_api_key?: string | null;
+            /** Chatgpt Api Key */
+            chatgpt_api_key?: string | null;
+            /** Claude Api Key */
+            claude_api_key?: string | null;
         };
         /** Chat */
         Chat: {
@@ -397,12 +435,12 @@ export interface components {
          * LLMModels
          * @enum {string}
          */
-        LLMModels: "gemini-2.5-flash" | "gemini-2.5-flash-lite" | "gemini-2.5-pro";
+        LLMModels: "gemini-2.5-flash" | "gemini-2.5-flash-lite" | "gemini-2.5-pro" | "gpt-5" | "gpt-5-pro" | "gpt-5-mini" | "gpt-5-nano" | "claude-3-haiku" | "claude-3-sonnet" | "claude-3-opus";
         /**
          * LLMProviders
          * @enum {string}
          */
-        LLMProviders: "google";
+        LLMProviders: "google" | "openai" | "anthropic";
         /** MessageRequest */
         MessageRequest: {
             /** Message */
@@ -434,6 +472,10 @@ export interface components {
             email: string;
             /** Gemini Api Key */
             gemini_api_key?: string | null;
+            /** Chatgpt Api Key */
+            chatgpt_api_key?: string | null;
+            /** Claude Api Key */
+            claude_api_key?: string | null;
             /** Id */
             id: number;
             /**
@@ -465,6 +507,26 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    healthz_healthz_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
     ping_ping_get: {
         parameters: {
             query?: never;
@@ -505,6 +567,26 @@ export interface operations {
             };
         };
     };
+    get_db_db_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
     get_supported_models_supported_models_get: {
         parameters: {
             query?: never;
@@ -520,10 +602,9 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": [
-                        components["schemas"]["LLMProviders"],
-                        components["schemas"]["LLMModels"]
-                    ][];
+                    "application/json": {
+                        [key: string]: components["schemas"]["LLMModels"][];
+                    };
                 };
             };
         };

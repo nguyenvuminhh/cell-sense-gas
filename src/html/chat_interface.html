@@ -202,9 +202,7 @@
           ></textarea>
           <div class="btn-row">
             <select id="model-selector" aria-label="Model selection">
-              <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
-              <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash</option>
-              <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+              <option value="" disabled selected>Loading models...</option>
             </select>
             <button id="send-btn" class="btn" onclick="sendMessage()">Send</button>
           </div>
@@ -252,6 +250,51 @@
         appendMessage(msg.content, sender);
       });
     }
+
+    /**
+     * Load supported models from the backend and populate the model selector
+     */
+    function loadSupportedModels() {
+      google.script.run
+        .withSuccessHandler(function (response) {
+          const selector = document.getElementById('model-selector');
+          selector.innerHTML = '';
+
+          const providers = Object.keys(response);
+
+          if (providers.length === 0) {
+            selector.innerHTML = `<option value="" disabled selected>No models available ${JSON.stringify(
+              response,
+            )}</option>`;
+            return;
+          }
+
+          let isFirst = true;
+          providers.forEach(function (provider) {
+            const models = response[provider] || [];
+            models.forEach(function (modelId) {
+              const option = document.createElement('option');
+              option.value = modelId;
+              option.textContent = modelId;
+              option.provider = provider;
+              if (isFirst) {
+                option.selected = true;
+                isFirst = false;
+              }
+              selector.appendChild(option);
+            });
+          });
+        })
+        .withFailureHandler(function (error) {
+          const selector = document.getElementById('model-selector');
+          selector.innerHTML = '<option value="" disabled selected>Error loading models</option>';
+          showAnnouncement('Error loading models: ' + (error.message || error), 'error');
+        })
+        .getSupportedModels();
+    }
+
+    // Load models on page load
+    loadSupportedModels();
 
     const input = document.getElementById('user-input');
     input.addEventListener('input', function () {
@@ -316,6 +359,7 @@
       }
 
       const selectedModel = modelSelector.value;
+      const selectedProvider = modelSelector.options[modelSelector.selectedIndex].provider;
       appendMessage(message, 'user');
       input.value = '';
       input.style.height = '60px';
@@ -331,7 +375,7 @@
         .withFailureHandler(function (error) {
           showAnnouncement(`Error: ${error.message || error}`, 'error', 5000);
         })
-        .handleMessage(message, CHAT_ID, selectedModel);
+        .handleMessage(message, CHAT_ID, selectedModel, selectedProvider);
     }
   </script>
 </html>

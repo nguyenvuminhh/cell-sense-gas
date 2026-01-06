@@ -24,9 +24,41 @@ function getCurrentUser(): ApiResponse<UserWithTruncatedApiKey> {
  * Update user's Gemini API key
  * @param apiKey - The Gemini API key to set, or empty string to remove
  */
-function updateApiKey(apiKey: string): ApiResponse<UserWithTruncatedApiKey> {
+function updateGeminiApiKey(apiKey: string): ApiResponse<UserWithTruncatedApiKey> {
   const payload: ApiKeyUpdateRequest = {
     gemini_api_key: apiKey,
+  };
+  const response = callApi<UserWithTruncatedApiKey>(
+    'PATCH',
+    `${CONFIG.API_URL}${API_PATHS.USER_API_KEY}`,
+    payload,
+  );
+  return response;
+}
+
+/**
+ * Update user's ChatGPT API key
+ * @param apiKey - The ChatGPT API key to set, or empty string to remove
+ */
+function updateChatGPTApiKey(apiKey: string): ApiResponse<UserWithTruncatedApiKey> {
+  const payload: ApiKeyUpdateRequest = {
+    chatgpt_api_key: apiKey,
+  };
+  const response = callApi<UserWithTruncatedApiKey>(
+    'PATCH',
+    `${CONFIG.API_URL}${API_PATHS.USER_API_KEY}`,
+    payload,
+  );
+  return response;
+}
+
+/**
+ * Update user's Claude API key
+ * @param apiKey - The Claude API key to set, or empty string to remove
+ */
+function updateClaudeApiKey(apiKey: string): ApiResponse<UserWithTruncatedApiKey> {
+  const payload: ApiKeyUpdateRequest = {
+    claude_api_key: apiKey,
   };
   const response = callApi<UserWithTruncatedApiKey>(
     'PATCH',
@@ -44,4 +76,10 @@ function getUserQuota(): ApiResponse<FreeUserQuota> {
   return response;
 }
 
-export { getCurrentUser, updateApiKey, getUserQuota };
+export {
+  getCurrentUser,
+  updateGeminiApiKey,
+  updateChatGPTApiKey,
+  updateClaudeApiKey,
+  getUserQuota,
+};

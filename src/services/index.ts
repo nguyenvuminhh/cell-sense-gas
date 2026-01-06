@@ -27,7 +27,13 @@ export {
 export { handleMessage } from './messageService';
 
 // User Service
-export { getCurrentUser, updateApiKey, getUserQuota } from './userService';
+export {
+  getCurrentUser,
+  updateGeminiApiKey,
+  updateChatGPTApiKey,
+  updateClaudeApiKey,
+  getUserQuota,
+} from './userService';
 
 // Model Service
 export { getSupportedModels } from './modelService';

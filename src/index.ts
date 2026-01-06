@@ -38,7 +38,9 @@ export {
   getChatMessages,
   handleMessage,
   getCurrentUser,
-  updateApiKey,
+  updateGeminiApiKey,
+  updateChatGPTApiKey,
+  updateClaudeApiKey,
   getUserQuota,
   getSupportedModels,
 } from './services';
@@ -50,5 +52,7 @@ export {
   createNewChat,
   openChatById,
   showProfile,
-  updateUserApiKey,
+  updateUserGeminiApiKey,
+  updateUserChatGPTApiKey,
+  updateUserClaudeApiKey,
 } from './Code';
