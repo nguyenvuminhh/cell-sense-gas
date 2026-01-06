@@ -197,29 +197,109 @@
       <div class="section">
         <div class="section-title">Gemini API Key</div>
         <div class="api-key-container">
-          <div id="api-key-view">
-            <div id="no-key-message" class="no-key-message hidden">No API key configured</div>
-            <div id="api-key-display" class="api-key-display hidden"></div>
+          <div id="gemini-key-view">
+            <div id="gemini-no-key-message" class="no-key-message hidden">
+              No API key configured
+            </div>
+            <div id="gemini-key-display" class="api-key-display hidden"></div>
             <div class="button-group">
-              <button class="btn btn-secondary" onclick="showEditApiKey()">
-                <span id="edit-key-text">Set API Key</span>
+              <button class="btn btn-secondary" onclick="showEditGeminiKey()">
+                <span id="gemini-edit-key-text">Set API Key</span>
               </button>
-              <button id="delete-key-btn" class="btn btn-danger hidden" onclick="deleteApiKey()">
+              <button
+                id="gemini-delete-key-btn"
+                class="btn btn-danger hidden"
+                onclick="deleteGeminiKey()"
+              >
                 Delete Key
               </button>
             </div>
           </div>
 
-          <div id="api-key-edit" class="hidden">
+          <div id="gemini-key-edit" class="hidden">
             <input
               type="text"
-              id="api-key-input"
+              id="gemini-key-input"
               class="api-key-input"
               placeholder="Enter your Gemini API key"
             />
             <div class="button-group">
-              <button class="btn btn-primary" onclick="saveApiKey()">Save</button>
-              <button class="btn btn-secondary" onclick="cancelEditApiKey()">Cancel</button>
+              <button class="btn btn-primary" onclick="saveGeminiKey()">Save</button>
+              <button class="btn btn-secondary" onclick="cancelEditGeminiKey()">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">ChatGPT API Key</div>
+        <div class="api-key-container">
+          <div id="chatgpt-key-view">
+            <div id="chatgpt-no-key-message" class="no-key-message hidden">
+              No API key configured
+            </div>
+            <div id="chatgpt-key-display" class="api-key-display hidden"></div>
+            <div class="button-group">
+              <button class="btn btn-secondary" onclick="showEditChatGPTKey()">
+                <span id="chatgpt-edit-key-text">Set API Key</span>
+              </button>
+              <button
+                id="chatgpt-delete-key-btn"
+                class="btn btn-danger hidden"
+                onclick="deleteChatGPTKey()"
+              >
+                Delete Key
+              </button>
+            </div>
+          </div>
+
+          <div id="chatgpt-key-edit" class="hidden">
+            <input
+              type="text"
+              id="chatgpt-key-input"
+              class="api-key-input"
+              placeholder="Enter your ChatGPT API key (sk-...)"
+            />
+            <div class="button-group">
+              <button class="btn btn-primary" onclick="saveChatGPTKey()">Save</button>
+              <button class="btn btn-secondary" onclick="cancelEditChatGPTKey()">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Claude API Key</div>
+        <div class="api-key-container">
+          <div id="claude-key-view">
+            <div id="claude-no-key-message" class="no-key-message hidden">
+              No API key configured
+            </div>
+            <div id="claude-key-display" class="api-key-display hidden"></div>
+            <div class="button-group">
+              <button class="btn btn-secondary" onclick="showEditClaudeKey()">
+                <span id="claude-edit-key-text">Set API Key</span>
+              </button>
+              <button
+                id="claude-delete-key-btn"
+                class="btn btn-danger hidden"
+                onclick="deleteClaudeKey()"
+              >
+                Delete Key
+              </button>
+            </div>
+          </div>
+
+          <div id="claude-key-edit" class="hidden">
+            <input
+              type="text"
+              id="claude-key-input"
+              class="api-key-input"
+              placeholder="Enter your Claude API key (sk-ant-...)"
+            />
+            <div class="button-group">
+              <button class="btn btn-primary" onclick="saveClaudeKey()">Save</button>
+              <button class="btn btn-secondary" onclick="cancelEditClaudeKey()">Cancel</button>
             </div>
           </div>
         </div>
@@ -292,20 +372,49 @@
           ? formatDate(USER_DATA.created_at)
           : '-';
 
-        // Handle API key display
-        const hasKey = USER_DATA.gemini_api_key && USER_DATA.gemini_api_key.length > 0;
-
-        if (hasKey) {
-          document.getElementById('api-key-display').textContent = USER_DATA.gemini_api_key;
-          document.getElementById('api-key-display').classList.remove('hidden');
-          document.getElementById('no-key-message').classList.add('hidden');
-          document.getElementById('delete-key-btn').classList.remove('hidden');
-          document.getElementById('edit-key-text').textContent = 'Change API Key';
+        // Handle Gemini API key display
+        const hasGeminiKey = USER_DATA.gemini_api_key && USER_DATA.gemini_api_key.length > 0;
+        if (hasGeminiKey) {
+          document.getElementById('gemini-key-display').textContent = USER_DATA.gemini_api_key;
+          document.getElementById('gemini-key-display').classList.remove('hidden');
+          document.getElementById('gemini-no-key-message').classList.add('hidden');
+          document.getElementById('gemini-delete-key-btn').classList.remove('hidden');
+          document.getElementById('gemini-edit-key-text').textContent = 'Change API Key';
         } else {
-          document.getElementById('api-key-display').classList.add('hidden');
-          document.getElementById('no-key-message').classList.remove('hidden');
-          document.getElementById('delete-key-btn').classList.add('hidden');
-          document.getElementById('edit-key-text').textContent = 'Set API Key';
+          document.getElementById('gemini-key-display').classList.add('hidden');
+          document.getElementById('gemini-no-key-message').classList.remove('hidden');
+          document.getElementById('gemini-delete-key-btn').classList.add('hidden');
+          document.getElementById('gemini-edit-key-text').textContent = 'Set API Key';
+        }
+
+        // Handle ChatGPT API key display
+        const hasChatGPTKey = USER_DATA.chatgpt_api_key && USER_DATA.chatgpt_api_key.length > 0;
+        if (hasChatGPTKey) {
+          document.getElementById('chatgpt-key-display').textContent = USER_DATA.chatgpt_api_key;
+          document.getElementById('chatgpt-key-display').classList.remove('hidden');
+          document.getElementById('chatgpt-no-key-message').classList.add('hidden');
+          document.getElementById('chatgpt-delete-key-btn').classList.remove('hidden');
+          document.getElementById('chatgpt-edit-key-text').textContent = 'Change API Key';
+        } else {
+          document.getElementById('chatgpt-key-display').classList.add('hidden');
+          document.getElementById('chatgpt-no-key-message').classList.remove('hidden');
+          document.getElementById('chatgpt-delete-key-btn').classList.add('hidden');
+          document.getElementById('chatgpt-edit-key-text').textContent = 'Set API Key';
+        }
+
+        // Handle Claude API key display
+        const hasClaudeKey = USER_DATA.claude_api_key && USER_DATA.claude_api_key.length > 0;
+        if (hasClaudeKey) {
+          document.getElementById('claude-key-display').textContent = USER_DATA.claude_api_key;
+          document.getElementById('claude-key-display').classList.remove('hidden');
+          document.getElementById('claude-no-key-message').classList.add('hidden');
+          document.getElementById('claude-delete-key-btn').classList.remove('hidden');
+          document.getElementById('claude-edit-key-text').textContent = 'Change API Key';
+        } else {
+          document.getElementById('claude-key-display').classList.add('hidden');
+          document.getElementById('claude-no-key-message').classList.remove('hidden');
+          document.getElementById('claude-delete-key-btn').classList.add('hidden');
+          document.getElementById('claude-edit-key-text').textContent = 'Set API Key';
         }
       }
 
@@ -319,33 +428,35 @@
       }
     }
 
+    // ========== Gemini API Key Functions ==========
+
     /**
-     * Show API key edit form
+     * Show Gemini API key edit form
      */
-    function showEditApiKey() {
+    function showEditGeminiKey() {
       if (isEditing) return;
       isEditing = true;
 
-      document.getElementById('api-key-view').classList.add('hidden');
-      document.getElementById('api-key-edit').classList.remove('hidden');
-      document.getElementById('api-key-input').value = '';
-      document.getElementById('api-key-input').focus();
+      document.getElementById('gemini-key-view').classList.add('hidden');
+      document.getElementById('gemini-key-edit').classList.remove('hidden');
+      document.getElementById('gemini-key-input').value = '';
+      document.getElementById('gemini-key-input').focus();
     }
 
     /**
-     * Cancel API key editing
+     * Cancel Gemini API key editing
      */
-    function cancelEditApiKey() {
+    function cancelEditGeminiKey() {
       isEditing = false;
-      document.getElementById('api-key-view').classList.remove('hidden');
-      document.getElementById('api-key-edit').classList.add('hidden');
+      document.getElementById('gemini-key-view').classList.remove('hidden');
+      document.getElementById('gemini-key-edit').classList.add('hidden');
     }
 
     /**
-     * Save API key
+     * Save Gemini API key
      */
-    function saveApiKey() {
-      const apiKey = document.getElementById('api-key-input').value.trim();
+    function saveGeminiKey() {
+      const apiKey = document.getElementById('gemini-key-input').value.trim();
 
       if (!apiKey) {
         showMessage('Please enter an API key', true);
@@ -366,10 +477,9 @@
           if (result.error) {
             showMessage('Error: ' + result.error, true);
           } else {
-            showMessage('API key updated successfully', false);
-            // Update the displayed data
+            showMessage('Gemini API key updated successfully', false);
             USER_DATA.gemini_api_key = result.gemini_api_key;
-            cancelEditApiKey();
+            cancelEditGeminiKey();
             loadUserData();
           }
         })
@@ -379,14 +489,14 @@
           });
           showMessage('Error: ' + (error.message || error), true);
         })
-        .updateUserApiKey(apiKey);
+        .updateUserGeminiApiKey(apiKey);
     }
 
     /**
-     * Delete API key
+     * Delete Gemini API key
      */
-    function deleteApiKey() {
-      if (!confirm('Are you sure you want to delete your API key?')) {
+    function deleteGeminiKey() {
+      if (!confirm('Are you sure you want to delete your Gemini API key?')) {
         return;
       }
 
@@ -404,8 +514,7 @@
           if (result.error) {
             showMessage('Error: ' + result.error, true);
           } else {
-            showMessage('API key deleted successfully', false);
-            // Update the displayed data
+            showMessage('Gemini API key deleted successfully', false);
             USER_DATA.gemini_api_key = null;
             loadUserData();
           }
@@ -416,7 +525,207 @@
           });
           showMessage('Error: ' + (error.message || error), true);
         })
-        .updateUserApiKey('');
+        .updateUserGeminiApiKey('');
+    }
+
+    // ========== ChatGPT API Key Functions ==========
+
+    /**
+     * Show ChatGPT API key edit form
+     */
+    function showEditChatGPTKey() {
+      if (isEditing) return;
+      isEditing = true;
+
+      document.getElementById('chatgpt-key-view').classList.add('hidden');
+      document.getElementById('chatgpt-key-edit').classList.remove('hidden');
+      document.getElementById('chatgpt-key-input').value = '';
+      document.getElementById('chatgpt-key-input').focus();
+    }
+
+    /**
+     * Cancel ChatGPT API key editing
+     */
+    function cancelEditChatGPTKey() {
+      isEditing = false;
+      document.getElementById('chatgpt-key-view').classList.remove('hidden');
+      document.getElementById('chatgpt-key-edit').classList.add('hidden');
+    }
+
+    /**
+     * Save ChatGPT API key
+     */
+    function saveChatGPTKey() {
+      const apiKey = document.getElementById('chatgpt-key-input').value.trim();
+
+      if (!apiKey) {
+        showMessage('Please enter an API key', true);
+        return;
+      }
+
+      const buttons = document.querySelectorAll('.btn');
+      buttons.forEach(function (btn) {
+        btn.disabled = true;
+      });
+
+      google.script.run
+        .withSuccessHandler(function (result) {
+          buttons.forEach(function (btn) {
+            btn.disabled = false;
+          });
+
+          if (result.error) {
+            showMessage('Error: ' + result.error, true);
+          } else {
+            showMessage('ChatGPT API key updated successfully', false);
+            USER_DATA.chatgpt_api_key = result.chatgpt_api_key;
+            cancelEditChatGPTKey();
+            loadUserData();
+          }
+        })
+        .withFailureHandler(function (error) {
+          buttons.forEach(function (btn) {
+            btn.disabled = false;
+          });
+          showMessage('Error: ' + (error.message || error), true);
+        })
+        .updateUserChatGPTApiKey(apiKey);
+    }
+
+    /**
+     * Delete ChatGPT API key
+     */
+    function deleteChatGPTKey() {
+      if (!confirm('Are you sure you want to delete your ChatGPT API key?')) {
+        return;
+      }
+
+      const buttons = document.querySelectorAll('.btn');
+      buttons.forEach(function (btn) {
+        btn.disabled = true;
+      });
+
+      google.script.run
+        .withSuccessHandler(function (result) {
+          buttons.forEach(function (btn) {
+            btn.disabled = false;
+          });
+
+          if (result.error) {
+            showMessage('Error: ' + result.error, true);
+          } else {
+            showMessage('ChatGPT API key deleted successfully', false);
+            USER_DATA.chatgpt_api_key = null;
+            loadUserData();
+          }
+        })
+        .withFailureHandler(function (error) {
+          buttons.forEach(function (btn) {
+            btn.disabled = false;
+          });
+          showMessage('Error: ' + (error.message || error), true);
+        })
+        .updateUserChatGPTApiKey('');
+    }
+
+    // ========== Claude API Key Functions ==========
+
+    /**
+     * Show Claude API key edit form
+     */
+    function showEditClaudeKey() {
+      if (isEditing) return;
+      isEditing = true;
+
+      document.getElementById('claude-key-view').classList.add('hidden');
+      document.getElementById('claude-key-edit').classList.remove('hidden');
+      document.getElementById('claude-key-input').value = '';
+      document.getElementById('claude-key-input').focus();
+    }
+
+    /**
+     * Cancel Claude API key editing
+     */
+    function cancelEditClaudeKey() {
+      isEditing = false;
+      document.getElementById('claude-key-view').classList.remove('hidden');
+      document.getElementById('claude-key-edit').classList.add('hidden');
+    }
+
+    /**
+     * Save Claude API key
+     */
+    function saveClaudeKey() {
+      const apiKey = document.getElementById('claude-key-input').value.trim();
+
+      if (!apiKey) {
+        showMessage('Please enter an API key', true);
+        return;
+      }
+
+      const buttons = document.querySelectorAll('.btn');
+      buttons.forEach(function (btn) {
+        btn.disabled = true;
+      });
+
+      google.script.run
+        .withSuccessHandler(function (result) {
+          buttons.forEach(function (btn) {
+            btn.disabled = false;
+          });
+
+          if (result.error) {
+            showMessage('Error: ' + result.error, true);
+          } else {
+            showMessage('Claude API key updated successfully', false);
+            USER_DATA.claude_api_key = result.claude_api_key;
+            cancelEditClaudeKey();
+            loadUserData();
+          }
+        })
+        .withFailureHandler(function (error) {
+          buttons.forEach(function (btn) {
+            btn.disabled = false;
+          });
+          showMessage('Error: ' + (error.message || error), true);
+        })
+        .updateUserClaudeApiKey(apiKey);
+    }
+
+    /**
+     * Delete Claude API key
+     */
+    function deleteClaudeKey() {
+      if (!confirm('Are you sure you want to delete your Claude API key?')) {
+        return;
+      }
+
+      const buttons = document.querySelectorAll('.btn');
+      buttons.forEach(function (btn) {
+        btn.disabled = true;
+      });
+
+      google.script.run
+        .withSuccessHandler(function (result) {
+          buttons.forEach(function (btn) {
+            btn.disabled = false;
+          });
+
+          if (result.error) {
+            showMessage('Error: ' + result.error, true);
+          } else {
+            showMessage('Claude API key deleted successfully', false);
+            USER_DATA.claude_api_key = null;
+            loadUserData();
+          }
+        })
+        .withFailureHandler(function (error) {
+          buttons.forEach(function (btn) {
+            btn.disabled = false;
+          });
+          showMessage('Error: ' + (error.message || error), true);
+        })
+        .updateUserClaudeApiKey('');
     }
 
     // Load user data on page load

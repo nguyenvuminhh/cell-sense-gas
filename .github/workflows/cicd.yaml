@@ -1,0 +1,59 @@
+# source: https://github.com/gkukurin/automate_apps_script_deployment/blob/main/.github/workflows/config.yml
+name: CICD Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - develop-workflow
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install clasp
+        run: npm install -g @google/clasp
+
+      - run: |
+          gpg \
+            --quiet --batch --yes --decrypt --passphrase="${{ secrets.CLASP_SECRET }}" \
+            --output $HOME/.clasprc.json .clasprc.json.gpg
+
+      - name: Push code to Apps Script
+        env:
+          API_URL: ${{ vars.API_URL }}
+        run: |
+          make clasp_push_prod
+
+      - name: Copy .clasp.prod.json to .clasp.json
+        run: |
+          cp .clasp.prod.json .clasp.json
+
+      - name: Create new version
+        id: version
+        run: |
+          VERSION_MSG="Auto deploy: $(git log -1 --pretty=%B) | SHA: $GITHUB_SHA"
+          clasp version "$VERSION_MSG"
+          # Extract the new version number
+          VERSION_NUMBER=$(clasp versions | tail -n 1 | awk '{print $1}')
+          echo "version=$VERSION_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Update deployment to latest version
+        run: |
+          clasp deploy \
+            -i ${{ secrets.DEPLOYMENT_ID }} \
+            -V "${{ steps.version.outputs.version }}" \
+            -d "Auto deploy from GitHub Actions - $GITHUB_SHA"

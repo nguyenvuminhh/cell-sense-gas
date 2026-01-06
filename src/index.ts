@@ -38,11 +38,11 @@ export {
   getChatMessages,
   handleMessage,
   getCurrentUser,
-  updateApiKey,
+  updateGeminiApiKey,
+  updateChatGPTApiKey,
+  updateClaudeApiKey,
   getUserQuota,
   getSupportedModels,
-  getSecret,
-  signPayload,
 } from './services';
 
 export {
@@ -52,5 +52,7 @@ export {
   createNewChat,
   openChatById,
   showProfile,
-  updateUserApiKey,
+  updateUserGeminiApiKey,
+  updateUserChatGPTApiKey,
+  updateUserClaudeApiKey,
 } from './Code';

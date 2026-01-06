@@ -23,17 +23,17 @@ export {
   getChatMessages,
 } from './chatService';
 
-// GCP Service
-export { getSecret } from './gcpService';
-
-// Crypto Service
-export { signPayload } from './cryptoService';
-
 // Message Service
 export { handleMessage } from './messageService';
 
 // User Service
-export { getCurrentUser, updateApiKey, getUserQuota } from './userService';
+export {
+  getCurrentUser,
+  updateGeminiApiKey,
+  updateChatGPTApiKey,
+  updateClaudeApiKey,
+  getUserQuota,
+} from './userService';
 
 // Model Service
 export { getSupportedModels } from './modelService';

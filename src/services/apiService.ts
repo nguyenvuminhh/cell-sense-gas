@@ -3,7 +3,15 @@
  */
 
 import { ApiResponse, ApiErrorResponse } from '../config';
-import { signPayload } from './cryptoService';
+
+/**
+ * Get Google-signed identity token for backend verification.
+ * The token is an OIDC ID token signed by Google.
+ */
+function getIdentityToken(): string {
+  // eslint-disable-next-line no-undef
+  return ScriptApp.getIdentityToken();
+}
 
 /**
  * Build query string from object
@@ -28,7 +36,6 @@ function callApi<T>(
   payload: Record<string, unknown> = {},
   query: Record<string, string | number | boolean> = {},
   headers: Record<string, string> = {},
-  isFetchingSignature = false,
 ): ApiResponse<T> {
   // eslint-disable-next-line no-undef
   const userEmail = Session.getActiveUser().getEmail();
@@ -36,7 +43,11 @@ function callApi<T>(
   const now = new Date().toISOString();
   query.timestamp = now;
 
-  const fullUrl = url + (isFetchingSignature ? '' : buildQuery(query));
+  const fullUrl = url + buildQuery(query);
+
+  // Get Google-signed identity token for authentication
+  const idToken = getIdentityToken();
+
   // eslint-disable-next-line no-undef
   const options: GoogleAppsScript.URL_Fetch.URLFetchRequestOptions = {
     // eslint-disable-next-line no-undef
@@ -45,7 +56,7 @@ function callApi<T>(
     muteHttpExceptions: true,
     headers: {
       'ngrok-skip-browser-warning': 'true',
-      ...(isFetchingSignature ? {} : { 'X-Signature': signPayload(payload, fullUrl) }),
+      Authorization: `Bearer ${idToken}`,
       ...headers,
     },
   };

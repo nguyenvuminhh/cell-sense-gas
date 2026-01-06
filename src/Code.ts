@@ -6,7 +6,13 @@ import {
   getChat,
 } from './services/chatService';
 import { handleMessage } from './services/messageService';
-import { getCurrentUser, updateApiKey, getUserQuota } from './services/userService';
+import {
+  getCurrentUser,
+  updateGeminiApiKey,
+  updateChatGPTApiKey,
+  updateClaudeApiKey,
+  getUserQuota,
+} from './services/userService';
 
 /**
  * Main entry point - Creates the CellSense menu on spreadsheet open
@@ -109,10 +115,24 @@ function showProfile() {
 }
 
 /**
- * Update user's API key
+ * Update user's Gemini API key
  */
-function updateUserApiKey(apiKey: string) {
-  return updateApiKey(apiKey);
+function updateUserGeminiApiKey(apiKey: string) {
+  return updateGeminiApiKey(apiKey);
+}
+
+/**
+ * Update user's ChatGPT API key
+ */
+function updateUserChatGPTApiKey(apiKey: string) {
+  return updateChatGPTApiKey(apiKey);
+}
+
+/**
+ * Update user's Claude API key
+ */
+function updateUserClaudeApiKey(apiKey: string) {
+  return updateClaudeApiKey(apiKey);
 }
 
 export {
@@ -122,6 +142,8 @@ export {
   createNewChat,
   openChatById,
   showProfile,
-  updateUserApiKey,
+  updateUserGeminiApiKey,
+  updateUserChatGPTApiKey,
+  updateUserClaudeApiKey,
   handleMessage,
 };

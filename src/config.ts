@@ -1,7 +1,7 @@
 import { components, paths } from './types';
 
 const CONFIG = {
-  API_URL: 'https://turgid-unverified-sherril.ngrok-free.dev',
+  API_URL: 'API_URL_PLACEHOLDER',
   GCP_SECRET_MANAGER_URL:
     'https://secretmanager.googleapis.com/v1/projects/{projectId}' +
     '/secrets/{secretName}/versions/latest:access',
@@ -35,7 +35,6 @@ type MessageRequest = components['schemas']['MessageRequest'];
 type MessageResponse = components['schemas']['MessageResponse'];
 type Chat = components['schemas']['Chat'];
 type ChatMessage = components['schemas']['ChatMessage'];
-type ChatMessageRequest = components['schemas']['ChatMessageRequest'];
 type SelectedRange = components['schemas']['SelectedRange'];
 type FilledRange = components['schemas']['FilledRange'];
 type LLMModels = components['schemas']['LLMModels'];
@@ -70,7 +69,6 @@ export {
   MessageResponse,
   Chat,
   ChatMessage,
-  ChatMessageRequest,
   SelectedRange,
   FilledRange,
   LLMModels,
