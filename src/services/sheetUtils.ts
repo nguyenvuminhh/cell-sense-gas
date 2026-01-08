@@ -2,7 +2,7 @@
  * Sheet Utilities - Google Sheets helper functions
  */
 
-import { ActiveRangeInfo, RangePayload } from '../config';
+import { ActiveRangeInfo, RangePayload, SavedRange } from '../config';
 
 /**
  * Get the currently active range in A1 notation
@@ -91,9 +91,37 @@ function fillCellsWithFormula(sheetName: string, range: string, r1c1Formula: str
   targetRange.setFormulaR1C1(r1c1Formula);
 }
 
+/**
+ * Get current cell values for a range
+ */
+function getCellValues(sheetName: string, range: string): unknown[][] {
+  // eslint-disable-next-line no-undef
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+  if (!sheet) {
+    throw new Error(`Sheet not found: ${sheetName}`);
+  }
+  return sheet.getRange(range).getValues();
+}
+
+/**
+ * Restore cells to their saved values
+ */
+function restoreCellValues(savedRanges: SavedRange[]): void {
+  // eslint-disable-next-line no-undef
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  savedRanges.forEach(saved => {
+    const sheet = spreadsheet.getSheetByName(saved.sheetName);
+    if (sheet) {
+      sheet.getRange(saved.range).setValues(saved.values);
+    }
+  });
+}
+
 export {
   getActiveRangeA1Notation,
   getRangePayload,
   extractRangesFromMessage,
   fillCellsWithFormula,
+  getCellValues,
+  restoreCellValues,
 };

@@ -11,6 +11,8 @@ export {
   getRangePayload,
   extractRangesFromMessage,
   fillCellsWithFormula,
+  getCellValues,
+  restoreCellValues,
 } from './sheetUtils';
 
 // Chat Service

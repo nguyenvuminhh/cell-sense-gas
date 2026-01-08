@@ -62,6 +62,12 @@ interface RangePayload {
   cell_values: unknown[][];
 }
 
+interface SavedRange {
+  sheetName: string;
+  range: string;
+  values: unknown[][];
+}
+
 export {
   CONFIG,
   API_PATHS,
@@ -82,4 +88,5 @@ export {
   ApiResponse,
   ActiveRangeInfo,
   RangePayload,
+  SavedRange,
 };

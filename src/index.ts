@@ -19,6 +19,7 @@ export {
   ApiResponse,
   ActiveRangeInfo,
   RangePayload,
+  SavedRange,
 } from './config';
 
 export { paths, webhooks, components, $defs, operations } from './types';
@@ -30,6 +31,8 @@ export {
   getRangePayload,
   extractRangesFromMessage,
   fillCellsWithFormula,
+  getCellValues,
+  restoreCellValues,
   getChatList,
   getLatestChat,
   createChat,
@@ -55,4 +58,5 @@ export {
   updateUserGeminiApiKey,
   updateUserChatGPTApiKey,
   updateUserClaudeApiKey,
+  revertCellEdits,
 } from './Code';

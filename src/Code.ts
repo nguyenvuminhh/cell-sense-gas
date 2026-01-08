@@ -13,6 +13,8 @@ import {
   updateClaudeApiKey,
   getUserQuota,
 } from './services/userService';
+import { restoreCellValues } from './services/sheetUtils';
+import { SavedRange } from './config';
 
 /**
  * Main entry point - Creates the CellSense menu on spreadsheet open
@@ -135,6 +137,19 @@ function updateUserClaudeApiKey(apiKey: string) {
   return updateClaudeApiKey(apiKey);
 }
 
+/**
+ * Revert cell edits to their previous values
+ */
+function revertCellEdits(savedRanges: SavedRange[]) {
+  try {
+    restoreCellValues(savedRanges);
+    return { success: true };
+  } catch (err) {
+    const error = err as Error;
+    return { success: false, error: error.message };
+  }
+}
+
 export {
   onOpen,
   showLatestChat,
@@ -146,4 +161,5 @@ export {
   updateUserChatGPTApiKey,
   updateUserClaudeApiKey,
   handleMessage,
+  revertCellEdits,
 };
