@@ -2,13 +2,14 @@
  * Message Service - Message handling with LLM
  */
 
-import { CONFIG, API_PATHS, MessageRequest, MessageResponse } from '../config';
+import { CONFIG, API_PATHS, MessageRequest, MessageResponse, SavedRange } from '../config';
 import { callApi } from './apiService';
-import { extractRangesFromMessage, fillCellsWithFormula } from './sheetUtils';
+import { extractRangesFromMessage, fillCellsWithFormula, getCellValues } from './sheetUtils';
 
 interface HandleMessageResponse {
   reply: string | undefined;
   error: string | undefined;
+  savedRanges: SavedRange[] | undefined;
 }
 
 /**
@@ -59,22 +60,43 @@ function handleMessage(
       // eslint-disable-next-line no-empty
     }
 
-    return { error: errorText, reply: undefined };
+    return { error: errorText, reply: undefined, savedRanges: undefined };
   }
+
+  const savedRanges: SavedRange[] = [];
 
   try {
     const filled_ranges = response.filled_ranges;
     if (filled_ranges && filled_ranges.length > 0) {
+      // Save current cell values before applying edits
+      filled_ranges.forEach(filled_range => {
+        const currentValues = getCellValues(filled_range.sheet_name, filled_range.range);
+        savedRanges.push({
+          sheetName: filled_range.sheet_name,
+          range: filled_range.range,
+          values: currentValues,
+        });
+      });
+
+      // Apply the edits
       filled_ranges.forEach(filled_range => {
         fillCellsWithFormula(filled_range.sheet_name, filled_range.range, filled_range.r1c1_value);
       });
     }
   } catch (err) {
     const error = err as Error;
-    return { error: 'Error while filling cells: ' + error.message, reply: undefined };
+    return {
+      error: 'Error while filling cells: ' + error.message,
+      reply: undefined,
+      savedRanges: undefined,
+    };
   }
 
-  return { reply: response.message || 'No reply from server.', error: undefined };
+  return {
+    reply: response.message || 'No reply from server.',
+    error: undefined,
+    savedRanges: savedRanges.length > 0 ? savedRanges : undefined,
+  };
 }
 
 export { handleMessage };

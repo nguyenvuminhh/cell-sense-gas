@@ -86,6 +86,26 @@
         border-bottom-right-radius: 12px;
       }
 
+      .revert-btn {
+        background: #dc2626;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 4px 8px;
+        margin-top: 6px;
+        cursor: pointer;
+        font-size: 0.7rem;
+      }
+
+      .revert-btn:hover {
+        background: #b91c1c;
+      }
+
+      .revert-btn:disabled {
+        background: #6b7280;
+        cursor: not-allowed;
+      }
+
       #chat {
         flex: 1;
         overflow-y: auto;
@@ -178,6 +198,26 @@
       #send-btn {
         background: #1d4ed8;
       }
+
+      .loading-indicator {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 8px 12px;
+        background: #1f2937;
+        border-radius: 10px;
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 12px;
+        margin: 6px 0;
+        max-width: 80%;
+        font-size: 0.9rem;
+        color: #94a3b8;
+      }
+
+      .loading-dots {
+        min-width: 18px;
+        text-align: left;
+      }
     </style>
   </head>
   <body>
@@ -227,18 +267,69 @@
       }, duration);
     }
 
+    // Store saved ranges for revert functionality
+    let lastSavedRanges = null;
+    let revertMessageId = 0;
+
     /**
      * Appends a message to the chat display area
      * @param {string} text - The message text to display
      * @param {string} sender - The sender type ('user' or 'bot') for styling
+     * @param {Array|null} savedRanges - Optional saved ranges for revert functionality
      */
-    function appendMessage(text, sender) {
+    function appendMessage(text, sender, savedRanges = null) {
       const div = document.createElement('div');
       div.className = `chat-box ${sender}`;
-      div.textContent = text;
+
+      const textSpan = document.createElement('span');
+      textSpan.textContent = text;
+      div.appendChild(textSpan);
+
+      if (sender === 'bot' && savedRanges && savedRanges.length > 0) {
+        revertMessageId++;
+        const currentMessageId = revertMessageId;
+        const revertBtn = document.createElement('button');
+        revertBtn.className = 'revert-btn';
+        revertBtn.textContent = 'Revert Edit';
+        revertBtn.dataset.messageId = currentMessageId;
+        revertBtn.onclick = function () {
+          revertEdits(savedRanges, revertBtn);
+        };
+        div.appendChild(document.createElement('br'));
+        div.appendChild(revertBtn);
+      }
+
       const chat = document.getElementById('chat');
       chat.appendChild(div);
       chat.scrollTop = chat.scrollHeight;
+    }
+
+    /**
+     * Reverts cell edits to their previous values
+     * @param {Array} savedRanges - The saved ranges to restore
+     * @param {HTMLElement} button - The revert button element
+     */
+    function revertEdits(savedRanges, button) {
+      button.disabled = true;
+      button.textContent = 'Reverting...';
+
+      google.script.run
+        .withSuccessHandler(function (response) {
+          if (response.success) {
+            button.textContent = 'Reverted';
+            showAnnouncement('Cells reverted to previous values', 'success');
+          } else {
+            button.disabled = false;
+            button.textContent = 'Revert Edit';
+            showAnnouncement('Failed to revert: ' + (response.error || 'Unknown error'), 'error');
+          }
+        })
+        .withFailureHandler(function (error) {
+          button.disabled = false;
+          button.textContent = 'Revert Edit';
+          showAnnouncement('Failed to revert: ' + (error.message || error), 'error');
+        })
+        .revertCellEdits(savedRanges);
     }
 
     /**
@@ -343,6 +434,98 @@
         .getActiveRangeA1Notation();
     }
 
+    // Loading phrases for the animated indicator
+    const loadingPhrases = [
+      'Thinking',
+      'Processing',
+      'Working on it',
+      'Calculating',
+      'Analyzing',
+      'Checking',
+      'Loading',
+      'Preparing response',
+      'Considering',
+      'Contemplating',
+      'Reflecting',
+      'Reviewing',
+      'Evaluating',
+      'Taking a moment',
+      'Let me think',
+      'Gathering thoughts',
+      'Computing',
+      'Running inference',
+      'Executing logic',
+      'Parsing input',
+      'Synthesizing answer',
+      'Optimizing response',
+      'Resolving query',
+      'Generating output',
+      'One moment',
+      'Just a sec',
+      'Hang tight',
+      'Almost there',
+      'Give me a moment',
+      'Let me check',
+      'On it',
+      'Brain gears turning',
+      'Crunching the numbers',
+      'Consulting the neurons',
+      'Asking my inner AI',
+      'Booting brain cells',
+      'Thinking very hard',
+      'Summoning wisdom',
+      'Please wait',
+      'Hold on',
+      'Working',
+      'Processing request',
+      'Deliberating',
+      'Formulating response',
+      'Assessing information',
+      'Conducting analysis',
+      'Reviewing context',
+      'Inferring outcome',
+    ];
+
+    let loadingElement = null;
+    let loadingInterval = null;
+
+    /**
+     * Shows the loading indicator with animated dots
+     */
+    function showLoadingIndicator() {
+      const chat = document.getElementById('chat');
+      const phrase = loadingPhrases[Math.floor(Math.random() * loadingPhrases.length)];
+
+      loadingElement = document.createElement('div');
+      loadingElement.className = 'loading-indicator';
+      loadingElement.innerHTML = `<span class="loading-text">${phrase}</span><span class="loading-dots"></span>`;
+
+      chat.appendChild(loadingElement);
+      chat.scrollTop = chat.scrollHeight;
+
+      const dotsElement = loadingElement.querySelector('.loading-dots');
+      let dotCount = 0;
+
+      loadingInterval = setInterval(function () {
+        dotCount = (dotCount + 1) % 4;
+        dotsElement.textContent = '.'.repeat(dotCount);
+      }, 400);
+    }
+
+    /**
+     * Hides and removes the loading indicator
+     */
+    function hideLoadingIndicator() {
+      if (loadingInterval) {
+        clearInterval(loadingInterval);
+        loadingInterval = null;
+      }
+      if (loadingElement) {
+        loadingElement.remove();
+        loadingElement = null;
+      }
+    }
+
     /**
      * Sends the user's message to the backend for processing
      * Displays the user message, clears the input, and shows the bot's response
@@ -364,15 +547,19 @@
       input.value = '';
       input.style.height = '60px';
 
+      showLoadingIndicator();
+
       google.script.run
         .withSuccessHandler(function (response) {
+          hideLoadingIndicator();
           if (response.error) {
             showAnnouncement(`Error: ${response.error}`, 'error', 5000);
           } else {
-            appendMessage(response.reply, 'bot');
+            appendMessage(response.reply, 'bot', response.savedRanges);
           }
         })
         .withFailureHandler(function (error) {
+          hideLoadingIndicator();
           showAnnouncement(`Error: ${error.message || error}`, 'error', 5000);
         })
         .handleMessage(message, CHAT_ID, selectedModel, selectedProvider);
