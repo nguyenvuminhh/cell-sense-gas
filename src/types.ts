@@ -399,8 +399,8 @@ export interface components {
             sheet_name: string;
             /** Range */
             range: string;
-            /** R1C1 Value */
-            r1c1_value: string;
+            /** A1 Value */
+            a1_value: string;
         };
         /** FreeUserQuota */
         FreeUserQuota: {

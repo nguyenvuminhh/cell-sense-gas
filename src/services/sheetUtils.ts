@@ -80,7 +80,7 @@ function extractRangesFromMessage(message: string): RangePayload[] {
 /**
  * Fill cells with formula
  */
-function fillCellsWithFormula(sheetName: string, range: string, r1c1Formula: string): void {
+function fillCellsWithFormula(sheetName: string, range: string, a1Formula: string): void {
   // eslint-disable-next-line no-undef
   const targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
   if (!targetSheet) {
@@ -88,7 +88,7 @@ function fillCellsWithFormula(sheetName: string, range: string, r1c1Formula: str
   }
 
   const targetRange = targetSheet.getRange(range);
-  targetRange.setFormulaR1C1(r1c1Formula);
+  targetRange.setFormula(a1Formula);
 }
 
 /**

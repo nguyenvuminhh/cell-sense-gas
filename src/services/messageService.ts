@@ -80,7 +80,7 @@ function handleMessage(
 
       // Apply the edits
       filled_ranges.forEach(filled_range => {
-        fillCellsWithFormula(filled_range.sheet_name, filled_range.range, filled_range.r1c1_value);
+        fillCellsWithFormula(filled_range.sheet_name, filled_range.range, filled_range.a1_value);
       });
     }
   } catch (err) {
