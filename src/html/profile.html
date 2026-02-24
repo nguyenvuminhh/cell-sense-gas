@@ -489,7 +489,7 @@
           });
           showMessage('Error: ' + (error.message || error), true);
         })
-        .updateUserGeminiApiKey(apiKey);
+        .updateGeminiApiKey(apiKey);
     }
 
     /**
@@ -525,7 +525,7 @@
           });
           showMessage('Error: ' + (error.message || error), true);
         })
-        .updateUserGeminiApiKey('');
+        .updateGeminiApiKey('');
     }
 
     // ========== ChatGPT API Key Functions ==========
@@ -589,7 +589,7 @@
           });
           showMessage('Error: ' + (error.message || error), true);
         })
-        .updateUserChatGPTApiKey(apiKey);
+        .updateChatGPTApiKey(apiKey);
     }
 
     /**
@@ -625,7 +625,7 @@
           });
           showMessage('Error: ' + (error.message || error), true);
         })
-        .updateUserChatGPTApiKey('');
+        .updateChatGPTApiKey('');
     }
 
     // ========== Claude API Key Functions ==========
@@ -689,7 +689,7 @@
           });
           showMessage('Error: ' + (error.message || error), true);
         })
-        .updateUserClaudeApiKey(apiKey);
+        .updateClaudeApiKey(apiKey);
     }
 
     /**
@@ -725,7 +725,7 @@
           });
           showMessage('Error: ' + (error.message || error), true);
         })
-        .updateUserClaudeApiKey('');
+        .updateClaudeApiKey('');
     }
 
     // Load user data on page load

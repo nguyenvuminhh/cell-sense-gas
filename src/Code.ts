@@ -8,9 +8,6 @@ import {
 import { handleMessage } from './services/messageService';
 import {
   getCurrentUser,
-  updateGeminiApiKey,
-  updateChatGPTApiKey,
-  updateClaudeApiKey,
   getUserQuota,
 } from './services/userService';
 import { restoreCellValues } from './services/sheetUtils';
@@ -117,27 +114,6 @@ function showProfile() {
 }
 
 /**
- * Update user's Gemini API key
- */
-function updateUserGeminiApiKey(apiKey: string) {
-  return updateGeminiApiKey(apiKey);
-}
-
-/**
- * Update user's ChatGPT API key
- */
-function updateUserChatGPTApiKey(apiKey: string) {
-  return updateChatGPTApiKey(apiKey);
-}
-
-/**
- * Update user's Claude API key
- */
-function updateUserClaudeApiKey(apiKey: string) {
-  return updateClaudeApiKey(apiKey);
-}
-
-/**
  * Revert cell edits to their previous values
  */
 function revertCellEdits(savedRanges: SavedRange[]) {
@@ -157,9 +133,6 @@ export {
   createNewChat,
   openChatById,
   showProfile,
-  updateUserGeminiApiKey,
-  updateUserChatGPTApiKey,
-  updateUserClaudeApiKey,
   handleMessage,
   revertCellEdits,
 };

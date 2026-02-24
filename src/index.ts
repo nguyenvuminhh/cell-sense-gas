@@ -55,8 +55,5 @@ export {
   createNewChat,
   openChatById,
   showProfile,
-  updateUserGeminiApiKey,
-  updateUserChatGPTApiKey,
-  updateUserClaudeApiKey,
   revertCellEdits,
 } from './Code';
